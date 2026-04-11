@@ -16,3 +16,5 @@
 | 9 | Mọi thành viên trong nhóm đều commit code hàng tuần từ tuần 7 trên Github | 15 |
 | | **Tổng điểm thang 100 (max 100)** | 100 |
 | | **Điểm quy đổi về thang 10** | 10 |
+
+Nên xem nếu có thời gian: https://youtu.be/WgV6M1LyfNY?t=366
