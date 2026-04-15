@@ -1,12 +1,17 @@
 # hacker news clone
 
+> [!IMPORTANT]
+> [backlog - tuần 7](example.com)
+> 
+> [backlog - tuần 8](https://github.com/20252-IT4409-Nhom-20/BTL/milestone/1)
+> 
+> [tiêu chí chấm điểm](tieu_chi_cham_diem.md)
+
 ---
 
 ## 0. tổng quan
 
 dự án nhái hackernews, và thêm tính năng cập nhật trực tiếp bài đăng mới và comment mới
-
-[backlog](example.com)
 
 ---
 
