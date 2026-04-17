@@ -1,0 +1,107 @@
+body {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 10pt;
+  color: #828282;
+  margin: 0;
+  background-color: white;
+}
+
+#container {
+  width: 85%;
+  min-width: 796px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+/* Nav Bar */
+nav {
+  background-color: #ff6600;
+  padding: 2px;
+}
+
+.nav-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.logo-cell {
+  width: 18px;
+  padding-right: 4px;
+}
+
+.logo-img {
+  border: 1px white solid;
+  display: block;
+}
+
+.pagetop {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 10pt;
+  color: #222222;
+  line-height: 12pt;
+}
+
+.hnname {
+  margin-left: 1px;
+  margin-right: 5px;
+  font-weight: bold;
+}
+
+.hnname a {
+  color: #000000;
+}
+
+/* Main Content Area */
+main {
+  background-color: #f6f6ef;
+  min-height: 300px;
+}
+
+.content-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.spacer-row {
+  height: 10px;
+}
+
+.loading-cell {
+  padding: 10px;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.footer-divider {
+  background-color: #ff6600;
+  height: 2px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.yclinks {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 8pt;
+  color: #828282;
+  display: block;
+  margin: 10px 0;
+}
+
+/* Links */
+a:link {
+  color: #000000;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #828282;
+  text-decoration: none;
+}
+
+input[type='text'] {
+  font-size: 10pt;
+}
