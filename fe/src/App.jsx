@@ -1,10 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
+import LoginPage from './pages/LoginPage.jsx'
+import RegisterPage from './pages/RegisterPage.jsx'
 import './App.css'
 
-function App() {
+function getRoute() {
+  const hash = window.location.hash.replace(/^#/, '').split('?')[0]
+  if (hash === 'login') return 'login'
+  if (hash === 'register') return 'register'
+  return 'home'
+}
+
+function HomeView() {
   const [count, setCount] = useState(0)
 
   return (
@@ -116,6 +125,20 @@ function App() {
       <section id="spacer"></section>
     </>
   )
+}
+
+function App() {
+  const [route, setRoute] = useState(getRoute)
+
+  useEffect(() => {
+    const onHashChange = () => setRoute(getRoute())
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  if (route === 'login') return <LoginPage />
+  if (route === 'register') return <RegisterPage />
+  return <HomeView />
 }
 
 export default App
