@@ -3,7 +3,9 @@
 > [!IMPORTANT]
 > [backlog - tuần 7](example.com)
 > 
-> [backlog - tuần 8](https://github.com/20252-IT4409-Nhom-20/BTL/milestone/1) <- [you are here]
+> [backlog - tuần 8](https://github.com/20252-IT4409-Nhom-20/BTL/milestone/1)
+>
+> [backlog - tuần 9](https://github.com/20252-IT4409-Nhom-20/BTL/milestone/2) <- [you are here]
 > 
 > [tiêu chí chấm điểm](tieu_chi_cham_diem.md)
 
