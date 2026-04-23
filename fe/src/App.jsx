@@ -1,120 +1,219 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
+import { useEffect, useMemo, useState } from 'react'
+
+const API_BASE = 'https://hacker-news.firebaseio.com/v0'
+
+function formatRelativeTime(unixTime) {
+  if (!unixTime) {
+    return 'unknown time'
+  }
+
+  const deltaSeconds = Math.max(1, Math.floor(Date.now() / 1000) - unixTime)
+  const units = [
+    ['year', 31536000],
+    ['month', 2592000],
+    ['day', 86400],
+    ['hour', 3600],
+    ['minute', 60],
+    ['second', 1],
+  ]
+
+  for (const [unit, seconds] of units) {
+    const value = Math.floor(deltaSeconds / seconds)
+    if (value >= 1) {
+      return `${value} ${unit}${value > 1 ? 's' : ''} ago`
+    }
+  }
+
+  return 'just now'
+}
+
+function fetchItem(id, signal) {
+  return fetch(`${API_BASE}/item/${id}.json`, { signal }).then((res) => {
+    if (!res.ok) {
+      throw new Error('Cannot fetch Hacker News item')
+    }
+    return res.json()
+  })
+}
+
+async function fetchCommentTree(commentIds = [], signal) {
+  const comments = await Promise.all(
+    commentIds.map(async (id) => {
+      const comment = await fetchItem(id, signal)
+
+      if (!comment || comment.deleted || comment.dead) {
+        return null
+      }
+
+      const children = await fetchCommentTree(comment.kids ?? [], signal)
+
+      return {
+        ...comment,
+        children,
+      }
+    }),
+  )
+
+  return comments.filter(Boolean)
+}
+
+function CommentNode({ comment, depth = 0 }) {
+  return (
+    <li className="comment-item" style={{ '--depth': depth }}>
+      <div className="comment-meta">
+        <span className="author">{comment.by ?? 'unknown'}</span>
+        <span className="dot">•</span>
+        <span>{formatRelativeTime(comment.time)}</span>
+      </div>
+      <div
+        className="comment-text"
+        dangerouslySetInnerHTML={{ __html: comment.text ?? '' }}
+      />
+
+      {comment.children.length > 0 && (
+        <ul className="comment-children">
+          {comment.children.map((child) => (
+            <CommentNode key={child.id} comment={child} depth={depth + 1} />
+          ))}
+        </ul>
+      )}
+    </li>
+  )
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const initialId = useMemo(() => {
+    const idFromQuery = new URLSearchParams(window.location.search).get('id')
+    const parsed = Number(idFromQuery)
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : 8863
+  }, [])
+
+  const [itemId, setItemId] = useState(initialId)
+  const [inputId, setInputId] = useState(String(initialId))
+  const [story, setStory] = useState(null)
+  const [comments, setComments] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    async function loadItem() {
+      try {
+        setLoading(true)
+        setError('')
+
+        const item = await fetchItem(itemId, controller.signal)
+        if (!item) {
+          throw new Error(`Item #${itemId} not found`)
+        }
+
+        const commentTree = await fetchCommentTree(item.kids ?? [], controller.signal)
+
+        setStory(item)
+        setComments(commentTree)
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          return
+        }
+
+        setStory(null)
+        setComments([])
+        setError(err.message || 'Failed to load item')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadItem()
+
+    return () => controller.abort()
+  }, [itemId])
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    const parsed = Number(inputId)
+    if (!Number.isInteger(parsed) || parsed <= 0) {
+      setError('Please enter a valid numeric item id.')
+      return
+    }
+    setItemId(parsed)
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="page">
+      <header className="topbar">
+        <div className="brand">Huster News</div>
+        <form className="item-form" onSubmit={handleSubmit}>
+          <label htmlFor="item-id">Item ID</label>
+          <input
+            id="item-id"
+            value={inputId}
+            onChange={(event) => setInputId(event.target.value)}
+            inputMode="numeric"
+            placeholder="8863"
+          />
+          <button type="submit">Load</button>
+        </form>
+      </header>
 
-      <div className="ticks"></div>
+      <main className="content">
+        {loading && <p className="status">Loading item #{itemId}...</p>}
+        {!loading && error && <p className="status error">{error}</p>}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {!loading && !error && story && (
+          <>
+            <article className="story-card">
+              <p className="story-line">
+                <span className="score">{story.score ?? 0} points</span>
+                <span className="dot">•</span>
+                <span>by {story.by ?? 'unknown'}</span>
+                <span className="dot">•</span>
+                <span>{formatRelativeTime(story.time)}</span>
+              </p>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+              <h1>{story.title ?? `Item #${story.id}`}</h1>
+
+              <p className="story-links">
+                {story.url && (
+                  <a href={story.url} target="_blank" rel="noreferrer">
+                    Open original link
+                  </a>
+                )}
+                <a
+                  href={`https://news.ycombinator.com/item?id=${story.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  View on Hacker News
+                </a>
+              </p>
+
+              {story.text && (
+                <div
+                  className="story-text"
+                  dangerouslySetInnerHTML={{ __html: story.text }}
+                />
+              )}
+            </article>
+
+            <section className="comments-card">
+              <h2>Comments ({story.descendants ?? comments.length})</h2>
+              {comments.length === 0 ? (
+                <p className="status">No comments found.</p>
+              ) : (
+                <ul className="comment-list">
+                  {comments.map((comment) => (
+                    <CommentNode key={comment.id} comment={comment} />
+                  ))}
+                </ul>
+              )}
+            </section>
+          </>
+        )}
+      </main>
+    </div>
   )
 }
 
