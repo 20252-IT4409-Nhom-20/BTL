@@ -1,5 +1,5 @@
 import './App.css'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const API_BASE = 'https://hacker-news.firebaseio.com/v0'
 
@@ -83,20 +83,33 @@ function CommentNode({ comment, depth = 0 }) {
 }
 
 function App() {
-  const initialId = useMemo(() => {
+  const getIdFromQuery = () => {
     const idFromQuery = new URLSearchParams(window.location.search).get('id')
     const parsed = Number(idFromQuery)
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : 8863
-  }, [])
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null
+  }
 
-  const [itemId, setItemId] = useState(initialId)
-  const [inputId, setInputId] = useState(String(initialId))
+  // compute id from URL each render; listen to popstate to update when user navigates
+  const [itemId, setItemId] = useState(() => getIdFromQuery())
+  const [inputId, setInputId] = useState(() => {
+    const id = getIdFromQuery()
+    return id ? String(id) : ''
+  })
   const [story, setStory] = useState(null)
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
+    // update itemId if the user navigates browser history (back/forward) or manually changes URL
+    function handlePop() {
+      const id = getIdFromQuery()
+      setItemId(id)
+      setInputId(id ? String(id) : '')
+    }
+
+    window.addEventListener('popstate', handlePop)
+    window.addEventListener('hashchange', handlePop)
     const controller = new AbortController()
 
     async function loadItem() {
@@ -128,7 +141,11 @@ function App() {
 
     loadItem()
 
-    return () => controller.abort()
+    return () => {
+      controller.abort()
+      window.removeEventListener('popstate', handlePop)
+      window.removeEventListener('hashchange', handlePop)
+    }
   }, [itemId])
 
   function handleSubmit(event) {
@@ -138,7 +155,16 @@ function App() {
       setError('Please enter a valid numeric item id.')
       return
     }
+    // update state and sync URL so direct links work
     setItemId(parsed)
+    setInputId(String(parsed))
+    try {
+      const url = new URL(window.location.href)
+      url.searchParams.set('id', String(parsed))
+      window.history.replaceState(null, '', url.toString())
+    } catch (e) {
+      // ignore URL update failures (e.g., non-browser env)
+    }
   }
 
   return (
@@ -152,7 +178,7 @@ function App() {
             value={inputId}
             onChange={(event) => setInputId(event.target.value)}
             inputMode="numeric"
-            placeholder="8863"
+            placeholder="Search anything..."
           />
           <button type="submit">Load</button>
         </form>
