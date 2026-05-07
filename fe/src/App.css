@@ -14,6 +14,17 @@
   gap: 14px;
 }
 
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.nav-links a {
+  color: #000000;
+}
+
 .brand {
   font-size: 14px;
   font-weight: 700;
@@ -48,6 +59,52 @@
   background: #f6f6ef;
   flex: 1;
   padding: 14px;
+}
+
+.story-list h1 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.story-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.story-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.story-rank {
+  color: #6f6f6f;
+  width: 20px;
+  text-align: right;
+}
+
+.story-title {
+  color: #000000;
+  font-size: 14px;
+}
+
+.story-meta {
+  color: #6f6f6f;
+  font-size: 12px;
+}
+
+.story-meta a {
+  color: #6f6f6f;
+}
+
+.back-link {
+  border: none;
+  background: none;
+  color: #1a1a1a;
+  font-size: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
 }
 
 .story-card,
@@ -141,6 +198,22 @@ h2 {
 
 .status.error {
   color: #b00020;
+}
+
+.comment-feed-section h1 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.comment-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.comment-feed-item {
+  border-top: 1px solid #e3e3d8;
+  padding: 10px 0;
 }
 
 @media (max-width: 680px) {
