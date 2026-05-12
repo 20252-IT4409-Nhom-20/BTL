@@ -1,0 +1,38 @@
+/* Navbar styles extracted from news.css and refined for React */
+
+.nav-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.logo-cell {
+  width: 18px;
+  padding-right: 4px;
+}
+
+.logo-img {
+  border: 1px white solid;
+  display: block;
+}
+
+.pagetop {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 10pt;
+  color: #222222;
+  line-height: 12pt;
+}
+
+.hnname {
+  margin-left: 1px;
+  margin-right: 5px;
+  font-weight: bold;
+}
+
+.hnname a {
+  color: #000000;
+}
+
+/* Add active state for NavLinks */
+.pagetop a.active {
+  color: white; /* or any highlight color you prefer */
+}
