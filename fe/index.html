@@ -7,56 +7,7 @@
     <link rel="stylesheet" href="news.css" />
   </head>
   <body>
-    <div id="container">
-      <nav>
-        <table class="nav-table">
-          <tbody>
-            <tr>
-              <td class="logo-cell">
-                <a href="https://ctt.hust.edu.vn/">
-                  <img
-                    src="/icons.svg"
-                    width="18"
-                    height="18"
-                    class="logo-img"
-                  />
-                </a>
-              </td>
-              <td>
-                <span class="pagetop">
-                  <b class="hnname"><a href="news">Huster News</a></b>
-                  <a href="newest">new</a> | <a href="front">past</a> |
-                  <a href="newcomments">comments</a> | <a href="ask">ask</a> |
-                  <a href="show">show</a> | <a href="jobs">jobs</a> |
-                  <a href="submit">submit</a>
-                </span>
-              </td>
-              <td style="text-align: right; padding-right: 4px">
-                <span class="pagetop">
-                  <a href="login?goto=news">login</a>
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </nav>
-
-      <main id="news-root">
-        <table class="content-table" id="content-table"></table>
-      </main>
-      <script type="module" src="/src/main.jsx"></script>
-
-      <footer>
-        <div class="footer-divider"></div>
-        <span class="yclinks">
-          <a href="https://example.com">FAQ</a> | <a href="lists">Lists</a> |
-          <a href="legal">Legal</a> | <a href="apply">Apply to HUST</a> |
-          <a href="mailto:email@example.com">Contact</a>
-        </span>
-        <form method="get" action="https://hn.algolia.com/">
-          Search: <input type="text" name="q" size="17" />
-        </form>
-      </footer>
-    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
