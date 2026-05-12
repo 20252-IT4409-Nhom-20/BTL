@@ -1,16 +1,20 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import OAuthButtons from './OAuthButtons.jsx'
+import { register, login } from '@/features/auth/api'
 import './auth.css'
 
 function RegisterPage() {
+  const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
@@ -23,7 +27,7 @@ function RegisterPage() {
       setError('Username must be at least 3 characters.')
       return
     }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError('Email is invalid.')
       return
     }
@@ -36,7 +40,18 @@ function RegisterPage() {
       return
     }
 
-    setSuccess(`Account "${username}" created!`)
+    setSubmitting(true)
+    try {
+      await register({ username: username.trim(), email: email.trim(), password })
+      await login({ username: username.trim(), password })
+      setSuccess(`Account "${username}" created!`)
+      setTimeout(() => navigate('/news'), 600)
+    } catch (err) {
+      const message = err?.response?.data?.message || 'Registration failed.'
+      setError(message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -92,13 +107,13 @@ function RegisterPage() {
         </div>
         {error && <div className="auth-error">{error}</div>}
         {success && <div className="auth-success">{success}</div>}
-        <button type="submit" className="auth-primary">
-          Create account
+        <button type="submit" className="auth-primary" disabled={submitting}>
+          {submitting ? 'Creating...' : 'Create account'}
         </button>
       </form>
 
       <p className="auth-switch">
-        Already have an account? <a href="#login">Login</a>
+        Already have an account? <a href="/login">Login</a>
       </p>
     </div>
   )

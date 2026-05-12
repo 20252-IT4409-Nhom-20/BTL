@@ -1,14 +1,18 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import OAuthButtons from './OAuthButtons.jsx'
+import { login } from '@/features/auth/api'
 import './auth.css'
 
 function LoginPage() {
+  const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
@@ -22,7 +26,17 @@ function LoginPage() {
       return
     }
 
-    setSuccess(`Welcome back, ${username}!`)
+    setSubmitting(true)
+    try {
+      const data = await login({ username: username.trim(), password })
+      setSuccess(`Welcome back, ${data.user.username}!`)
+      setTimeout(() => navigate('/news'), 600)
+    } catch (err) {
+      const message = err?.response?.data?.message || 'Login failed.'
+      setError(message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -58,13 +72,13 @@ function LoginPage() {
         </div>
         {error && <div className="auth-error">{error}</div>}
         {success && <div className="auth-success">{success}</div>}
-        <button type="submit" className="auth-primary">
-          Login
+        <button type="submit" className="auth-primary" disabled={submitting}>
+          {submitting ? 'Logging in...' : 'Login'}
         </button>
       </form>
 
       <p className="auth-switch">
-        Don't have an account? <a href="#register">Register</a>
+        Don't have an account? <a href="/register">Register</a>
       </p>
     </div>
   )
