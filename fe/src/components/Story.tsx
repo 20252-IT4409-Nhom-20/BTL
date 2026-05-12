@@ -1,5 +1,5 @@
 import { useItem } from '@/features/hn/api/getItem';
-import { timeFormatter } from '../lib/timeFormatter';
+import { timeFormatter } from '@/lib/timeFormatter';
 import type { hnItem } from '@/features/hn/types/hnitem';
 
 interface StoryProps {
