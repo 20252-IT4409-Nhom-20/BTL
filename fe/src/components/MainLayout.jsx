@@ -7,7 +7,7 @@ export const MainLayout = () => {
 
       <Navbar />
 
-      <main id="news-root">
+      <main id="main-content">
         <Outlet />
       </main>
 

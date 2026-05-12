@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
-import type { hnItem } from '@/features/hn/types/hnitem';
+import type { hnItem } from '@/features/stories/types/hnItem';
 
 export const fetchItem = (id: number): Promise<hnItem> => api.get(`/item/${id}.json`);
 

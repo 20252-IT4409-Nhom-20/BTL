@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
-import { useStories } from '@/features/hn/api/getStories';
-import Story from '@/components/Story';
+import { useStories } from '@/features/stories/api/getStories';
+import Story from '@/features/stories/components/Story';
 
 const pathToType = {
   news: 'top',

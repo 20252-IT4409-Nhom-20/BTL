@@ -1,6 +1,6 @@
-import { useItem } from '@/features/hn/api/getItem';
+import { useItem } from '@/features/stories/api/getItem';
 import { timeFormatter } from '@/lib/timeFormatter';
-import type { hnItem } from '@/features/hn/types/hnitem';
+import type { hnItem } from '@/features/stories/types/hnItem';
 
 interface StoryProps {
   id: number;
