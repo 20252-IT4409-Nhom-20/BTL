@@ -1,21 +1,19 @@
 import { useParams } from 'react-router-dom';
-import { useStories } from '@/features/stories/api/getStories';
+import { useStories, type StoryType } from '@/features/stories/api/getStories';
 import Story from '@/features/stories/components/Story';
 
-const pathToType = {
+const pathToType: Record<string, StoryType> = {
   news: 'top',
   new: 'new',
   ask: 'ask',
   show: 'show',
   jobs: 'job',
-} as const;
-
-type PathKey = keyof typeof pathToType;
+};
 
 export default function News() {
   const { type } = useParams<{ type: string }>();
-  const storyType = pathToType[(type as PathKey) ?? 'news'] ?? 'news';
-  const { data: ids, isLoading, error } = useStories(storyType);
+  const storyType = pathToType[type ?? 'news'] ?? 'top';
+  const { data, isLoading, error } = useStories(storyType);
 
   if (isLoading) {
     return <tr>Loading...</tr>;
@@ -24,8 +22,8 @@ export default function News() {
   return (
     <table>
       <tbody>
-        {ids?.slice(0, 30).map((id: number, index: number) => (
-          <Story key={id} id={id} rank={index + 1} />
+        {data?.items.map((item, index) => (
+          <Story key={item.id} item={item} rank={index + 1} />
         ))}
       </tbody>
     </table>

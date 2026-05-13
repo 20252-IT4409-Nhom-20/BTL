@@ -36,3 +36,40 @@
 .pagetop a.active {
   color: white; /* or any highlight color you prefer */
 }
+
+.nav-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ff6600;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: Verdana, Geneva, sans-serif;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.nav-logout {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: #000;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.nav-logout:hover {
+  color: #ffffff;
+}

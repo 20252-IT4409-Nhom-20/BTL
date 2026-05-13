@@ -1,14 +1,19 @@
 import Axios, { InternalAxiosRequestConfig } from 'axios';
+import { getToken } from '@/lib/auth-client';
 
 function requestInterceptor(config: InternalAxiosRequestConfig) {
   if (config.headers) {
     config.headers.Accept = 'application/json';
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 }
 
 export const api = Axios.create({
-  baseURL: 'https://hacker-news.firebaseio.com/v0',
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000/api',
 });
 
 api.interceptors.request.use(requestInterceptor);
@@ -16,5 +21,3 @@ api.interceptors.response.use(
   (response) => response.data,
   (error) => Promise.reject(error)
 );
-
-// watered down version of https://github.com/alan2207/bulletproof-react/blob/master/apps/react-vite/src/lib/api-client.ts
