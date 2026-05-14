@@ -56,11 +56,60 @@ code {
 .kids-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.kids-table th,
-.kids-table td {
+.kids-table th {
   padding: 6px 4px;
   text-align: left;
   vertical-align: top;
+}
+
+.kids-table .comment-cell {
+  padding: 0 4px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.hn-comment {
+  margin-inline-start: min(var(--comment-indent, 0px), 42vw);
+  max-width: 100%;
+}
+
+.comment-meta {
+  color: #828282;
+  font-size: 10pt;
+  line-height: 1.25;
+}
+
+.comment-meta a {
+  color: #828282;
+}
+
+.votearrow {
+  color: #999999;
+  font-size: 10px;
+  vertical-align: 1px;
+}
+
+.comment-body {
+  color: #000000;
+  font-size: 10pt;
+  line-height: 1.35;
+  margin-top: 6px;
+}
+
+.comment-body p {
+  margin: 0 0 8px;
+}
+
+.comment-actions {
+  font-size: 10pt;
+  margin-top: 6px;
+}
+
+@media (max-width: 680px) {
+  .hn-comment {
+    margin-inline-start: min(var(--comment-indent, 0px), 30vw);
+  }
 }

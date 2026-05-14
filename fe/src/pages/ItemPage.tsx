@@ -1,6 +1,86 @@
+import type { CSSProperties } from 'react';
 import { useParams } from 'react-router-dom';
 import { useItem } from '@/features/stories/api/getItem';
 import { timeFormatter } from '@/lib/timeFormatter';
+
+interface CommentRowsProps {
+  ids: number[];
+  depth?: number;
+}
+
+function CommentRows({ ids, depth = 0 }: CommentRowsProps) {
+  return (
+    <>
+      {ids.map((id) => (
+        <CommentRow key={id} id={id} depth={depth} />
+      ))}
+    </>
+  );
+}
+
+interface CommentRowProps {
+  id: number;
+  depth: number;
+}
+
+function CommentRow({ id, depth }: CommentRowProps) {
+  const { data: comment, isLoading, error } = useItem(id);
+  const depthStyle = { '--comment-indent': `${depth * 40}px` } as CSSProperties;
+
+  if (isLoading) {
+    return (
+      <tr className="comment-row">
+        <td className="comment-cell">
+          <article className="hn-comment status" style={depthStyle}>
+            Loading comment...
+          </article>
+        </td>
+      </tr>
+    );
+  }
+
+  if (error) {
+    return (
+      <tr className="comment-row">
+        <td className="comment-cell">
+          <article className="hn-comment status error" style={depthStyle}>
+            Error loading comment #{id}: {error.message}
+          </article>
+        </td>
+      </tr>
+    );
+  }
+
+  if (!comment || comment.dead) {
+    return null;
+  }
+
+  const replies = Array.isArray(comment.kids) ? comment.kids : [];
+
+  return (
+    <>
+      <tr className="comment-row" style={depthStyle}>
+        <td className="comment-cell">
+          <article className="hn-comment" style={depthStyle}>
+            <div className="comment-meta">
+              <span className="votearrow">▲</span>{' '}
+              <a href={`/item/${comment.id}`}>{comment.by ?? 'unknown'}</a>{' '}
+              {timeFormatter(comment.time)} | parent | next [–]
+            </div>
+            <div
+              className="comment-body text-wrap"
+              dangerouslySetInnerHTML={{ __html: comment.text ?? '[deleted]' }}
+            />
+            <div className="comment-actions">
+              <a href={`/item/${comment.id}`}>reply</a>
+            </div>
+          </article>
+        </td>
+      </tr>
+      {replies.length > 0 && <CommentRows ids={replies} depth={depth + 1} />}
+    </>
+  );
+}
 
 export default function ItemPage() {
   const { id } = useParams<{ id: string }>();
@@ -44,19 +124,8 @@ export default function ItemPage() {
         <p className="status">No comments</p>
       ) : (
         <table className="kids-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Kid ID</th>
-            </tr>
-          </thead>
           <tbody>
-            {kids.map((kidId, index) => (
-              <tr key={kidId}>
-                <td>{index + 1}</td>
-                <td className="text-wrap">{kidId}</td>
-              </tr>
-            ))}
+            <CommentRows ids={kids} />
           </tbody>
         </table>
       )}
