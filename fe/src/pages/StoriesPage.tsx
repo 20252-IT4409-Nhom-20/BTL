@@ -35,6 +35,10 @@ export default function StoriesPage() {
   const canGoPrevious = page > 1;
   const canGoNext = items && items.length > 0;
 
+  const handleLimitChange = (newLimit: number) => {
+    navigate(`/${type}?page=1&limit=${newLimit}`);
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -52,6 +56,21 @@ export default function StoriesPage() {
         <button onClick={handleNext} disabled={!canGoNext}>
           Next Page
         </button>
+      </div>
+
+      <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="limit-select" style={{ marginRight: '0.5rem' }}>
+          Items per page:
+        </label>
+        <select
+          id="limit-select"
+          value={limit}
+          onChange={(e) => handleLimitChange(Number(e.target.value))}
+        >
+          <option value={30}>30</option>
+          <option value={40}>40</option>
+          <option value={50}>50</option>
+        </select>
       </div>
 
       <table>
