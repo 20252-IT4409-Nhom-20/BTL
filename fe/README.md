@@ -1,16 +1,36 @@
-# React + Vite
+# Hacker News Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React frontend for Hacker News built with Vite, React Query, and a feature-based architecture.
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev       # Start dev server
+npm run lint      # Run linter
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Project Structure
 
-## React Compiler
+Use bulletproof react organization:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```text
+src/
+├── components/    Shared UI and layouts
+├── features/      Feature modules (nav, stories, users)
+├── lib/           Shared utilities
+├── pages/         Page-level components
+└── main.jsx       Entry point
+```
 
-## Expanding the ESLint configuration
+## Documentation
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **[Architecture](./docs/architecture/overview.md)** - Feature-based structure and core design decisions.
+- **[Data Flow](./docs/architecture/data-fetching.md)** - How React Query handles caching and API calls.
+- **[Shared Infrastructure](./docs/architecture/infrastructure.md)** - API client, layouts, and utilities.
+
+### Features
+- **[Stories](./docs/features/stories.md)** - Story list and item detail display.
+- **[Navigation](./docs/features/nav.md)** - URL-driven category switching.
+
+### Adding a New Feature
+
+See [Architecture Overview](./docs/architecture/overview.md) → Design Rules section.

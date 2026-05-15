@@ -1,0 +1,17 @@
+{
+  "by": "indigodaddy",
+  "descendants": 69,
+  "id": 44057612,
+  "kids": [
+    44061329, 44059127, 44058915, 44064572, 44057915, 44062075, 44064063,
+    44061879, 44058962, 44062067, 44058257, 44057892, 44064415, 44058464,
+    44058009, 44058118, 44058511, 44060051, 44064019, 44059106, 44064302,
+    44063006, 44058583, 44058098, 44061595
+  ],
+  "score": 268,
+  "text": "I combined this with a simple API to update a CSV file using Deno&#x2F;deno-csv library, allowing an Ansible job to easily update a CSV file via the API with Ansible URI module, and then have that same CSV file viewable&#x2F;downloadable in a simple and easy&#x2F;dashboardy way (with CSV-to-html-table).  Copilot created the Deno&#x2F;deno-csv CSV API code and then with a little back and forth I added static website functionality (to serve the CSV table), and I had a &#x2F;view and a &#x2F;update route.  I&#x27;m just a sysadmin but I love piecing together stuff like this.  Thanks Derek!",
+  "time": 1747873861,
+  "title": "Display any CSV file as a searchable, filterable, pretty HTML table",
+  "type": "story",
+  "url": "https://github.com/derekeder/csv-to-html-table"
+}
