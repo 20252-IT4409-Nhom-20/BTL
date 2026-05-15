@@ -1,21 +1,12 @@
-import { useItem } from '@/features/stories/api/getItem';
 import { timeFormatter } from '@/lib/timeFormatter';
 import type { hnItem } from '@/types/hnItem';
 
 interface StoryProps {
-  id: number;
+  item: hnItem;
   rank: number;
 }
 
-export default function Story({ id, rank }: StoryProps) {
-  const { data: story, isLoading, error } = useItem(id);
-
-  if (isLoading) {
-    return <tr>Loading...</tr>;
-  }
-  if (error || !story) return null;
-
-  const item = story as hnItem;
+export default function Story({ item, rank }: StoryProps) {
   return (
     <>
       <tr>

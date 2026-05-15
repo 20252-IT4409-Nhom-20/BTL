@@ -1,5 +1,6 @@
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useStoriesItems } from '@/features/stories/api/getItems';
+import Story from '@/features/stories/components/Story';
 
 const pathToType = {
   news: 'top',
@@ -75,7 +76,9 @@ export default function StoriesPage() {
 
       <table>
         <tbody>
-          {/* Items here */}
+          {items?.map((item, index) => (
+            <Story key={item.id} item={item} rank={index + 1} />
+          ))}
         </tbody>
       </table>
     </div>
