@@ -1,16 +1,32 @@
 import Axios, { InternalAxiosRequestConfig, AxiosError } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+
+/**
+ * Public endpoints
+ */
+const PUBLIC_ENDPOINTS = [
+  '/auth/login',
+  '/auth/register',
+  '/topstories.json',
+  '/health',
+];
 
 /**
  * Request interceptor: Add auth token and standard headers
  * This runs on EVERY request automatically
  */
 function requestInterceptor(config: InternalAxiosRequestConfig) {
-  // Add auth token if it exists in localStorage
-  const token = localStorage.getItem('auth_token');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const isPublic = PUBLIC_ENDPOINTS.some((endpoint) =>
+    config.url?.includes(endpoint)
+  );
+
+  if (!isPublic) {
+    const token = localStorage.getItem('auth_token');
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
 
   // Standard headers for all requests
@@ -58,9 +74,6 @@ export const api = Axios.create({
 });
 
 api.interceptors.request.use(requestInterceptor);
-api.interceptors.response.use(
-  (response) => response.data,
-  responseInterceptor
-);
+api.interceptors.response.use((response) => response.data, responseInterceptor);
 
 // Reference: https://github.com/alan2207/bulletproof-react/blob/master/apps/react-vite/src/lib/api-client.ts
