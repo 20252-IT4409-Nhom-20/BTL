@@ -1,8 +1,11 @@
 const express = require("express");
+const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
+app.use(cors());
+
 const PORT = 3000;
 
 // Serve the mock stories data
