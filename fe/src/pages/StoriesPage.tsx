@@ -47,8 +47,8 @@ export default function StoriesPage() {
   return (
     <div>
       <div>DEBUG: Fetched {items?.length ?? 0} items (page={page}, limit={limit})</div>
-      
-      <div style={{ marginBottom: '1rem' }}>
+
+      <div>
         <button onClick={handlePrevious} disabled={!canGoPrevious}>
           Previous Page
         </button>
@@ -58,7 +58,7 @@ export default function StoriesPage() {
         </button>
       </div>
 
-      <div style={{ marginBottom: '1rem' }}>
+      <div>
         <label htmlFor="limit-select" style={{ marginRight: '0.5rem' }}>
           Items per page:
         </label>
