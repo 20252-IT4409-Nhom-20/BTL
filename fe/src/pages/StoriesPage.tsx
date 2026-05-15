@@ -47,9 +47,16 @@ export default function StoriesPage() {
 
   return (
     <div>
-      <div>DEBUG: Fetched {items?.length ?? 0} items (page={page}, limit={limit})</div>
 
-      <div>
+      <table>
+        <tbody>
+          {items?.map((item, index) => (
+            <Story key={item.id} item={item} rank={index + 1} />
+          ))}
+        </tbody>
+      </table>
+
+      <div style={{ textAlign: 'center' }}>
         <button onClick={handlePrevious} disabled={!canGoPrevious}>
           Previous Page
         </button>
@@ -59,7 +66,7 @@ export default function StoriesPage() {
         </button>
       </div>
 
-      <div>
+      <div style={{ textAlign: 'center' }}>
         <label htmlFor="limit-select" style={{ marginRight: '0.5rem' }}>
           Items per page:
         </label>
@@ -76,13 +83,6 @@ export default function StoriesPage() {
         </select>
       </div>
 
-      <table>
-        <tbody>
-          {items?.map((item, index) => (
-            <Story key={item.id} item={item} rank={index + 1} />
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }
