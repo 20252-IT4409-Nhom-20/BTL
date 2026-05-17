@@ -1,0 +1,86 @@
+[
+  {
+    "by": "indigodaddy",
+    "descendants": 69,
+    "score": 268,
+    "id": 44057612,
+    "time": 1747873861,
+    "title": "Display any CSV file as a searchable, filterable, pretty HTML table",
+    "url": "https://github.com/derekeder/csv-to-html-table"
+  },
+  {
+    "by": "magesh_magi1",
+    "id": 44059106,
+    "text": "Ha, I'm working on a similar utility with some extra features also enabling WASM that might help in case of larger files.",
+    "time": 1747892838,
+    "kids": [
+      {
+        "by": "byteforge",
+        "id": 44059144,
+        "text": "WASM support actually sounds really useful here. Are you compiling with Rust or Go?",
+        "time": 1747893012,
+        "kids": [
+          {
+            "by": "magesh_magi1",
+            "id": 44059201,
+            "text": "Rust mostly. The binary size is pretty reasonable so far.",
+            "time": 1747893275,
+            "kids": []
+          }
+        ]
+      },
+      {
+        "by": "dev_null22",
+        "id": 44059171,
+        "text": "Curious how it performs with multi-GB files compared to native tooling.",
+        "time": 1747893098,
+        "kids": []
+      }
+    ]
+  },
+  {
+    "by": "sarahcodes",
+    "id": 44059310,
+    "text": "This is one of those tiny tools that ends up saving hours over time.",
+    "time": 1747893801,
+    "kids": [
+      {
+        "by": "linuxtaco",
+        "id": 44059342,
+        "text": "Yeah, especially when you need something quick without spinning up a whole pipeline.",
+        "time": 1747893920,
+        "kids": [
+          {
+            "by": "sarahcodes",
+            "id": 44059388,
+            "text": "Exactly. Simplicity matters more than feature count sometimes.",
+            "time": 1747894103,
+            "kids": []
+          },
+          {
+            "by": "retrocompiler",
+            "id": 44059401,
+            "text": "The best tools are usually the boring ones that just work.",
+            "time": 1747894177,
+            "kids": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "by": "packetpilot",
+    "id": 44059488,
+    "text": "Nice project. The docs were surprisingly clear too.",
+    "time": 1747894704,
+    "kids": [
+      {
+        "by": "opencodefan",
+        "id": 44059521,
+        "text": "Agreed, setup took less than 2 minutes for me.",
+        "time": 1747894828,
+        "kids": []
+      }
+    ]
+  }
+]
