@@ -2,16 +2,15 @@
 
 A React frontend for Hacker News built with Vite, React Query, and a feature-based architecture.
 
-## Quick Start
-
 ```bash
 npm install
 npm run dev       # Start dev server
-npm run build     # Production build
 npm run lint      # Run linter
 ```
 
 ## Project Structure
+
+Use bulletproof react organization:
 
 ```text
 src/
@@ -21,8 +20,6 @@ src/
 ├── pages/         Page-level components
 └── main.jsx       Entry point
 ```
-
-Each feature is self-contained with its own `api/`, `components/`, and `types/` directories.
 
 ## Documentation
 
