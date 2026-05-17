@@ -7,7 +7,7 @@ export interface hnItem{
     dead?: boolean;
     parent?: number;
     //poll không rõ
-    kids?: number[];
+    kids?: hnItem[];
     url?: string;
     score?: number;
     title?: string;

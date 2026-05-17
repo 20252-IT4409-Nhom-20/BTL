@@ -3,12 +3,14 @@ import { MainLayout } from '@/components/MainLayout';
 import StoriesPage from '@/pages/StoriesPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
+import ItemPage from '@/pages/ItemPage';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
+          <Route path="/item/:id" element={<ItemPage />} />
           <Route path="/:type" element={<StoriesPage />} />
           <Route path="/" element={<Navigate to="/news" replace />} />
         </Route>
