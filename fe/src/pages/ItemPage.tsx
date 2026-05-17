@@ -21,37 +21,37 @@ export default function ItemPage() {
     return <p className="status error">Error: {error.message}</p>;
   }
 
-  if (!item) {
+  if (!item || item.length === 0) {
     return <p className="status">Item not found.</p>;
   }
 
-  const kids = Array.isArray(item.kids) ? item.kids : [];
+  const [story, ...commentIds] = item;
 
   return (
     <section className="item-page">
-      <h1 className="item-title">{item.title ?? `Item #${item.id}`}</h1>
+      <h1 className="item-title">{story.title ?? `Item #${story.id}`}</h1>
       <p className="item-meta">
-        {item.score ?? 0} points by {item.by ?? 'unknown'} · {timeFormatter(item.time)}
+        {story.score ?? 0} points by {story.by ?? 'unknown'} · {timeFormatter(story.time)}
       </p>
-      {item.text && (
+      {story.text && (
         <div
           className="item-text text-wrap"
-          dangerouslySetInnerHTML={{ __html: item.text }}
+          dangerouslySetInnerHTML={{ __html: story.text }}
         />
       )}
 
       <h2>Comments</h2>
-      {kids.length === 0 ? (
-        <p className="status">No comments</p>
-      ) : (
-        <table className="kids-table">
-          <tbody>
-            {kids.map((commentId) => (
-              <Comment key={commentId} id={commentId} depth={0} />
-            ))}
-          </tbody>
-        </table>
-      )}
+      {/* {kids.length === 0 ? ( */}
+      {/*   <p className="status">No comments</p> */}
+      {/* ) : ( */}
+      {/*   <table className="kids-table"> */}
+      {/*     <tbody> */}
+      {/*       {kids.map((commentId) => ( */}
+      {/*         <Comment key={commentId} id={commentId} depth={0} /> */}
+      {/*       ))} */}
+      {/*     </tbody> */}
+      {/*   </table> */}
+      {/* )} */}
     </section>
   );
 }
