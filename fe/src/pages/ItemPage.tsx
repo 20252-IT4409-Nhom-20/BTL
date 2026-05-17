@@ -25,7 +25,7 @@ export default function ItemPage() {
     return <p className="status">Item not found.</p>;
   }
 
-  const [story, ...commentIds] = item;
+  const [story, ...comments] = item;
 
   return (
     <section className="item-page">
@@ -41,17 +41,17 @@ export default function ItemPage() {
       )}
 
       <h2>Comments</h2>
-      {/* {kids.length === 0 ? ( */}
-      {/*   <p className="status">No comments</p> */}
-      {/* ) : ( */}
-      {/*   <table className="kids-table"> */}
-      {/*     <tbody> */}
-      {/*       {kids.map((commentId) => ( */}
-      {/*         <Comment key={commentId} id={commentId} depth={0} /> */}
-      {/*       ))} */}
-      {/*     </tbody> */}
-      {/*   </table> */}
-      {/* )} */}
+      {comments.length === 0 ? (
+        <p className="status">No comments</p>
+      ) : (
+        <table className="kids-table">
+          <tbody>
+            {comments.map((commentObj) => (
+              <Comment key={commentObj.id} comment={commentObj} depth={0} />
+            ))}
+          </tbody>
+        </table>
+      )}
     </section>
   );
 }

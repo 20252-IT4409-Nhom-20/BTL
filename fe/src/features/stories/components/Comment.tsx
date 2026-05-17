@@ -1,39 +1,14 @@
 import type { CSSProperties } from 'react';
-import { useItem } from '@/features/stories/api/getItem';
 import { timeFormatter } from '@/lib/timeFormatter';
+import type { hnItem } from '@/types/hnItem';
 
 interface CommentProps {
-  id: number;
+  comment: hnItem;
   depth: number;
 }
 
-export default function Comment({ id, depth }: CommentProps) {
-  const { data: comment, isLoading, error } = useItem(id);
+export default function Comment({ comment, depth }: CommentProps) {
   const depthStyle = { '--comment-indent': `${depth * 40}px` } as CSSProperties;
-
-  if (isLoading) {
-    return (
-      <tr className="comment-row">
-        <td className="comment-cell">
-          <article className="hn-comment status" style={depthStyle}>
-            Loading comment...
-          </article>
-        </td>
-      </tr>
-    );
-  }
-
-  if (error) {
-    return (
-      <tr className="comment-row">
-        <td className="comment-cell">
-          <article className="hn-comment status error" style={depthStyle}>
-            Error loading comment #{id}: {error.message}
-          </article>
-        </td>
-      </tr>
-    );
-  }
 
   if (!comment || comment.dead) {
     return null;
@@ -61,8 +36,8 @@ export default function Comment({ id, depth }: CommentProps) {
           </article>
         </td>
       </tr>
-      {replies.map((kidId) => (
-        <Comment key={kidId} id={kidId} depth={depth + 1} />
+      {replies.map((kid) => (
+        <Comment key={kid.id} comment={kid} depth={depth + 1} />
       ))}
     </>
   );
