@@ -52,7 +52,7 @@ After initial load, send only changed fields via WebSocket or polling:
 
 ## Implementation
 
-**`src/features/stories/api/getStoriesBatch.ts`**
+**`src/features/stories/api/getStories.ts`**
 ```typescript
 export const getStoriesBatch = (type: string): Promise<{items: hnItem[], timestamp: number}> =>
   api.get(`/stories/${type}`);
