@@ -9,7 +9,7 @@ const API_BASE_URL =
 const PUBLIC_ENDPOINTS = [
   '/auth/login',
   '/auth/register',
-  '/topstories.json',
+  '/topstories',
   '/health',
 ];
 

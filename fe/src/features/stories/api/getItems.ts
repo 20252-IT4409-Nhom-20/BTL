@@ -3,12 +3,12 @@ import { api } from '@/lib/api-client';
 import type { hnItem } from '@/types/hnItem';
 
 const storyEndpoints = {
-  top: '/topstories.json',
-  new: '/newstories.json',
-  best: '/beststories.json',
-  ask: '/askstories.json',
-  show: '/showstories.json',
-  job: '/jobstories.json',
+  top: '/topstories',
+  new: '/newstories',
+  best: '/beststories',
+  ask: '/askstories',
+  show: '/showstories',
+  job: '/jobstories',
 };
 
 export const fetchStoriesItems = (
