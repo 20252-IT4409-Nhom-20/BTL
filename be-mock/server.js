@@ -9,18 +9,22 @@ app.use(cors());
 // Request and response logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
-  console.log(`📥 request from ${req.ip || req.connection.remoteAddress} -> ${req.method} ${req.path}`);
-  
+  console.log(
+    `📥 request from ${req.ip || req.connection.remoteAddress} -> ${req.method} ${req.path}`,
+  );
+
   // Capture the original send method
   const originalSend = res.send;
-  res.send = function(data) {
+  res.send = function (data) {
     const duration = Date.now() - start;
     const statusCode = res.statusCode;
-    const emoji = statusCode >= 400 ? '❌' : '✅';
-    console.log(`${emoji} response (${statusCode}) [${duration}ms] -> served ${req.path}`);
+    const emoji = statusCode >= 400 ? "❌" : "✅";
+    console.log(
+      `${emoji} response (${statusCode}) [${duration}ms] -> served ${req.path}`,
+    );
     return originalSend.call(this, data);
   };
-  
+
   next();
 });
 
@@ -66,8 +70,6 @@ app.get("/health", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Mock server running at http://localhost:${PORT}`);
-  console.log(
-    `Stories available at http://localhost:${PORT}/api/topstories.json`,
-  );
+  console.log(`Stories available at http://localhost:${PORT}/api/topstories`);
   console.log(`Item available at http://localhost:${PORT}/api/item/44057612`);
 });

@@ -6,6 +6,7 @@
     "id": 44057612,
     "time": 1747873861,
     "title": "Display any CSV file as a searchable, filterable, pretty HTML table",
+    "text": "I combined this with a simple API to update a CSV file using Deno&#x2F;deno-csv library, allowing an Ansible job to easily update a CSV file via the API with Ansible URI module, and then have that same CSV file viewable&#x2F;downloadable in a simple and easy&#x2F;dashboardy way (with CSV-to-html-table).  Copilot created the Deno&#x2F;deno-csv CSV API code and then with a little back and forth I added static website functionality (to serve the CSV table), and I had a &#x2F;view and a &#x2F;update route.  I&#x27;m just a sysadmin but I love piecing together stuff like this.  Thanks Derek!",
     "url": "https://github.com/derekeder/csv-to-html-table"
   },
   {
