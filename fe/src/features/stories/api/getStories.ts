@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
-import type { hnItem } from '@/features/stories/types/hnItem';
+import type { hnItem } from '@/types/hnItem';
 
 export type StoryType = 'top' | 'new' | 'best' | 'ask' | 'show' | 'job';
 
