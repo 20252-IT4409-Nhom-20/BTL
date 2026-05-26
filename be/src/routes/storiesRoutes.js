@@ -4,17 +4,11 @@ const auth = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-const STORY_LIST_ENDPOINTS = [
-  '/topstories',
-  '/newstories',
-  '/beststories',
-  '/askstories',
-  '/showstories',
-  '/jobstories',
-];
+// Read endpoints (PR22 shape)
+router.get('/stories/item/:id', storiesController.getItem);
+router.get('/stories/:type', storiesController.getStories);
 
-router.get(STORY_LIST_ENDPOINTS, storiesController.getStories);
-router.get('/item/:id', storiesController.getItem);
+// Write endpoints (PR21 shape, auth-gated)
 router.post('/stories', auth, storiesController.createStory);
 router.post('/stories/:id/comments', auth, storiesController.createComment);
 router.put('/stories/:id/vote', auth, storiesController.voteStory);

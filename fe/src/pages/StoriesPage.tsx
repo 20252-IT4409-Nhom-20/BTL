@@ -1,6 +1,5 @@
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { useStoriesItems } from '@/features/stories/api/getItems';
-import type { StoryType } from '@/features/stories/api/getStories';
+import { useStoriesItems, type StoryType } from '@/features/stories/api/getItems';
 import Story from '@/features/stories/components/Story';
 
 const pathToType: Record<string, StoryType> = {
