@@ -1,80 +1,111 @@
-const express = require('express');
+const fs = require('fs/promises');
+const path = require('path');
 
-const router = express.Router();
+const MOCK_DATA_DIR = path.resolve(__dirname, '../../../be-mock/mock_data');
+const STORY_TYPES = new Set(['story', 'ask', 'show', 'job', 'poll']);
 
-const HN_BASE = 'https://hacker-news.firebaseio.com/v0';
-
-const TYPE_TO_ENDPOINT = {
-  top: 'topstories',
-  new: 'newstories',
-  best: 'beststories',
-  ask: 'askstories',
-  show: 'showstories',
-  job: 'jobstories',
-};
-
-async function fetchJson(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Upstream ${res.status} for ${url}`);
-  return res.json();
+async function readMockJson(fileName) {
+  const filePath = path.join(MOCK_DATA_DIR, fileName);
+  const raw = await fs.readFile(filePath, 'utf8');
+  return JSON.parse(raw);
 }
 
-router.get('/:type', async (req, res) => {
-  const { type } = req.params;
-  const endpoint = TYPE_TO_ENDPOINT[type];
-  if (!endpoint) {
+async function getStories(req, res) {
+  try {
+    const stories = await readMockJson('topstories.json');
+    return res.json(stories);
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to read top stories' });
+  }
+}
+
+async function getItem(req, res) {
+  try {
+    const item = await readMockJson(`${req.params.id}.json`);
+    return res.json(item);
+  } catch (err) {
+    return res.status(404).json({ message: `Item ${req.params.id} not found` });
+  }
+}
+
+function createStory(req, res) {
+  const { title, url, text, type = 'story' } = req.body || {};
+
+  if (!title || typeof title !== 'string' || !title.trim()) {
+    return res.status(400).json({ message: 'Title is required' });
+  }
+
+  if (!STORY_TYPES.has(type)) {
     return res.status(400).json({ message: 'Invalid story type' });
   }
 
-  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 30, 1), 100);
-  const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
-  const offset = (page - 1) * limit;
-
-  try {
-    const ids = await fetchJson(`${HN_BASE}/${endpoint}.json`);
-    const sliced = (ids || []).slice(offset, offset + limit);
-    const items = await Promise.all(
-      sliced.map((id) => fetchJson(`${HN_BASE}/item/${id}.json`))
-    );
-    return res.json({ type, page, count: items.length, items: items.filter(Boolean) });
-  } catch (err) {
-    return res.status(502).json({ message: 'Failed to fetch stories', error: err.message });
+  if (!url && !text) {
+    return res.status(400).json({ message: 'Either url or text is required' });
   }
-});
 
-const MAX_COMMENT_DEPTH = 6;
+  const now = Math.floor(Date.now() / 1000);
 
-async function fetchCommentTree(id, depth) {
-  const node = await fetchJson(`${HN_BASE}/item/${id}.json`);
-  if (!node) return null;
-  if (depth >= MAX_COMMENT_DEPTH || !Array.isArray(node.kids) || node.kids.length === 0) {
-    node.kids = [];
-    return node;
-  }
-  const children = await Promise.all(
-    node.kids.map((kidId) => fetchCommentTree(kidId, depth + 1))
-  );
-  node.kids = children.filter(Boolean);
-  return node;
+  return res.status(201).json({
+    message: 'Story creation placeholder. Persist this to the database later.',
+    story: {
+      id: now,
+      type,
+      title: title.trim(),
+      url: url || undefined,
+      text: text || undefined,
+      by: req.user?.id || 'authenticated-user',
+      time: now,
+      score: 0,
+      descendants: 0,
+    },
+  });
 }
 
-router.get('/item/:id', async (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (!Number.isFinite(id)) {
-    return res.status(400).json({ message: 'Invalid item id' });
-  }
-  try {
-    const story = await fetchJson(`${HN_BASE}/item/${id}.json`);
-    if (!story) return res.status(404).json({ message: 'Item not found' });
-    const kidIds = Array.isArray(story.kids) ? story.kids : [];
-    const comments = (
-      await Promise.all(kidIds.map((kidId) => fetchCommentTree(kidId, 1)))
-    ).filter(Boolean);
-    const storyWithoutKids = { ...story, kids: [] };
-    return res.json({ item: [storyWithoutKids, ...comments] });
-  } catch (err) {
-    return res.status(502).json({ message: 'Failed to fetch item', error: err.message });
-  }
-});
+function createComment(req, res) {
+  const { text, parent_id: parentId } = req.body || {};
 
-module.exports = router;
+  if (!text || typeof text !== 'string' || !text.trim()) {
+    return res.status(400).json({ message: 'Comment text is required' });
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+
+  return res.status(201).json({
+    message: 'Comment creation placeholder. Persist this to the database later.',
+    comment: {
+      id: now,
+      type: 'comment',
+      by: req.user?.id || 'authenticated-user',
+      time: now,
+      text: text.trim(),
+      parent: Number(parentId || req.params.id),
+      kids: [],
+    },
+  });
+}
+
+function voteStory(req, res) {
+  return res.json({
+    message: 'Vote placeholder. Toggle the authenticated user vote in the database later.',
+    storyId: Number(req.params.id),
+    voted: true,
+    scoreDelta: 1,
+  });
+}
+
+function deleteStory(req, res) {
+  return res.json({
+    message: 'Delete story placeholder. Enforce author/admin ownership in the database later.',
+    storyId: Number(req.params.id),
+    deleted: true,
+  });
+}
+
+module.exports = {
+  getStories,
+  getItem,
+  createStory,
+  createComment,
+  voteStory,
+  deleteStory,
+};
