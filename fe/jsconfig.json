@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    //"baseUrl": ".", phần này không được hỗ trợ trong tương lai gần nên tôi xóa đi. Đặc tả path sẽ sử dụng bên dưới
+    //                đọc thêm: https://github.com/microsoft/TypeScript/issues/62207
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "jsx": "react-jsx"
+  }
+}

@@ -60,6 +60,14 @@ main {
 .content-table {
   width: 100%;
   border-collapse: collapse;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.content-table td,
+.content-table th {
+  padding: 0;
 }
 
 .spacer-row {
