@@ -1,23 +1,21 @@
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { useStoriesItems } from '@/features/stories/api/getItems';
+import { useStoriesItems, type StoryType } from '@/features/stories/api/getItems';
 import Story from '@/features/stories/components/Story';
 
-const pathToType = {
+const pathToType: Record<string, StoryType> = {
   news: 'top',
   new: 'new',
   ask: 'ask',
   show: 'show',
   jobs: 'job',
-} as const;
-
-type PathKey = keyof typeof pathToType;
+};
 
 export default function StoriesPage() {
   const { type } = useParams<{ type: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const storyType = pathToType[(type as PathKey) ?? 'news'] ?? 'top';
+  const storyType = pathToType[type ?? 'news'] ?? 'top';
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
   const limit = Math.max(1, parseInt(searchParams.get('limit') || '30', 10));
 

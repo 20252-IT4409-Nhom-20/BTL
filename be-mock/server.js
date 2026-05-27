@@ -8,14 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 const STORY_TYPES = new Set(["story", "ask", "show", "job", "poll"]);
-const STORY_LIST_ENDPOINTS = [
-  "/api/topstories",
-  "/api/newstories",
-  "/api/beststories",
-  "/api/askstories",
-  "/api/showstories",
-  "/api/jobstories",
-];
+const FEED_TYPES = new Set(["top", "new", "best", "ask", "show", "job"]);
 
 function requireMockAuth(req, res, next) {
   const header = req.headers.authorization || "";
@@ -80,36 +73,54 @@ app.use((req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 
-// Serve the mock stories data
-app.get(STORY_LIST_ENDPOINTS, (req, res) => {
+// Serve stories by feed type (parameterized endpoint)
+app.get("/api/stories/:type", (req, res) => {
+  const { type } = req.params;
+  if (!FEED_TYPES.has(type)) {
+    return res.status(400).json({ message: "Invalid story type" });
+  }
+
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 30, 1), 100);
+  const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+  const offset = (page - 1) * limit;
+
   const filePath = path.join(__dirname, "mock_data", "topstories.json");
 
   fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {
-      res.status(500).json({ error: "Failed to read stories data" });
-      console.error("Error reading file:", err);
-      return;
+      return res.status(500).json({ message: "Failed to read stories" });
     }
 
-    res.setHeader("Content-Type", "application/json");
-    res.send(data);
+    try {
+      const all = JSON.parse(data);
+      const items = (Array.isArray(all) ? all : []).slice(offset, offset + limit);
+      res.json({ type, page, count: items.length, items });
+    } catch (parseErr) {
+      res.status(500).json({ message: "Failed to parse stories data" });
+      console.error("Error parsing JSON:", parseErr);
+    }
   });
 });
 
 // Serve individual item data
-app.get("/api/item/:id", (req, res) => {
+app.get("/api/stories/item/:id", (req, res) => {
   const itemId = req.params.id;
   const filePath = path.join(__dirname, "mock_data", `${itemId}.json`);
 
   fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {
-      res.status(404).json({ error: `Item ${itemId} not found` });
-      console.error(`Error reading file for item ${itemId}:`, err);
-      return;
+      return res.status(404).json({ message: `Item ${itemId} not found` });
     }
 
-    res.setHeader("Content-Type", "application/json");
-    res.send(data);
+    try {
+      const itemData = JSON.parse(data);
+      // Mock stores items as [story, ...comments]; pass through under { item } envelope.
+      const item = Array.isArray(itemData) ? itemData : [itemData];
+      res.json({ item });
+    } catch (parseErr) {
+      res.status(500).json({ message: "Failed to parse item data" });
+      console.error(`Error parsing item ${itemId}:`, parseErr);
+    }
   });
 });
 
@@ -180,7 +191,8 @@ app.get("/health", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Mock server running at http://localhost:${PORT}`);
-  console.log(`Stories available at http://localhost:${PORT}/api/topstories`);
-  console.log(`Item available at http://localhost:${PORT}/api/item/44057612`);
+  console.log(`Stories available at http://localhost:${PORT}/api/stories/:type (type: top, new, best, ask, show, job)`);
+  console.log(`Example: http://localhost:${PORT}/api/stories/top?page=1&limit=30`);
+  console.log(`Item available at http://localhost:${PORT}/api/stories/item/44057612`);
   console.log(`Write placeholders available under http://localhost:${PORT}/api/stories`);
 });

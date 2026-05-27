@@ -1,7 +1,8 @@
 import Axios, { InternalAxiosRequestConfig, AxiosError } from 'axios';
+import { getToken, clearAuth } from '@/lib/auth-client';
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 /**
  * Public endpoints
@@ -23,13 +24,12 @@ function requestInterceptor(config: InternalAxiosRequestConfig) {
   );
 
   if (!isPublic) {
-    const token = localStorage.getItem('auth_token');
+    const token = getToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
 
-  // Standard headers for all requests
   if (config.headers) {
     config.headers.Accept = 'application/json';
     config.headers['Content-Type'] = 'application/json';
@@ -43,11 +43,9 @@ function requestInterceptor(config: InternalAxiosRequestConfig) {
  * This runs on EVERY response (success or error)
  */
 function responseInterceptor(error: AxiosError) {
-  // Handle specific HTTP status codes globally
   if (error.response?.status === 401) {
-    // Token expired or invalid
     console.warn('[API] 401 Unauthorized - redirecting to login');
-    localStorage.removeItem('auth_token');
+    clearAuth();
     window.location.href = '/login';
   }
 

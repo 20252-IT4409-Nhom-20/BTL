@@ -3,6 +3,7 @@ const path = require('path');
 
 const MOCK_DATA_DIR = path.resolve(__dirname, '../../../be-mock/mock_data');
 const STORY_TYPES = new Set(['story', 'ask', 'show', 'job', 'poll']);
+const FEED_TYPES = new Set(['top', 'new', 'best', 'ask', 'show', 'job']);
 
 async function readMockJson(fileName) {
   const filePath = path.join(MOCK_DATA_DIR, fileName);
@@ -11,18 +12,31 @@ async function readMockJson(fileName) {
 }
 
 async function getStories(req, res) {
+  const { type } = req.params;
+  if (!FEED_TYPES.has(type)) {
+    return res.status(400).json({ message: 'Invalid story type' });
+  }
+
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 30, 1), 100);
+  const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+  const offset = (page - 1) * limit;
+
   try {
-    const stories = await readMockJson('topstories.json');
-    return res.json(stories);
+    // Mock data only has topstories; reuse for all feed types until real data lands.
+    const all = await readMockJson('topstories.json');
+    const items = (Array.isArray(all) ? all : []).slice(offset, offset + limit);
+    return res.json({ type, page, count: items.length, items });
   } catch (err) {
-    return res.status(500).json({ message: 'Failed to read top stories' });
+    return res.status(500).json({ message: 'Failed to read stories' });
   }
 }
 
 async function getItem(req, res) {
   try {
-    const item = await readMockJson(`${req.params.id}.json`);
-    return res.json(item);
+    const data = await readMockJson(`${req.params.id}.json`);
+    // Mock stores items as [story, ...comments]; pass through under { item } envelope.
+    const item = Array.isArray(data) ? data : [data];
+    return res.json({ item });
   } catch (err) {
     return res.status(404).json({ message: `Item ${req.params.id} not found` });
   }
