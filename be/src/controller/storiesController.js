@@ -1,14 +1,41 @@
-const fs = require('fs/promises');
-const path = require('path');
+const Item = require('../models/itemModel');
 
-const MOCK_DATA_DIR = path.resolve(__dirname, '../../../be-mock/mock_data');
 const STORY_TYPES = new Set(['story', 'ask', 'show', 'job', 'poll']);
 const FEED_TYPES = new Set(['top', 'new', 'best', 'ask', 'show', 'job']);
 
-async function readMockJson(fileName) {
-  const filePath = path.join(MOCK_DATA_DIR, fileName);
-  const raw = await fs.readFile(filePath, 'utf8');
-  return JSON.parse(raw);
+const FEED_TYPE_TO_ITEM_TYPE = {
+  top: 'story',
+  new: 'story',
+  best: 'story',
+  ask: 'ask',
+  show: 'show',
+  job: 'job',
+};
+
+const FEED_SORT = {
+  top: { score: -1, time: -1 },
+  new: { time: -1 },
+  best: { score: -1 },
+  ask: { score: -1, time: -1 },
+  show: { score: -1, time: -1 },
+  job: { time: -1 },
+};
+
+const MAX_COMMENT_DEPTH = 6;
+
+async function buildCommentTree(parentId, depth) {
+  if (depth >= MAX_COMMENT_DEPTH) return [];
+  const children = await Item.find({
+    parent: parentId,
+    deleted: { $ne: true },
+    dead: { $ne: true },
+  })
+    .sort({ time: 1 })
+    .lean();
+  for (const child of children) {
+    child.kids = await buildCommentTree(child.id, depth + 1);
+  }
+  return children;
 }
 
 async function getStories(req, res) {
@@ -21,10 +48,20 @@ async function getStories(req, res) {
   const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
   const offset = (page - 1) * limit;
 
+  const itemType = FEED_TYPE_TO_ITEM_TYPE[type];
+  const sort = FEED_SORT[type] || { score: -1 };
+
   try {
-    // Mock data only has topstories; reuse for all feed types until real data lands.
-    const all = await readMockJson('topstories.json');
-    const items = (Array.isArray(all) ? all : []).slice(offset, offset + limit);
+    const items = await Item.find({
+      type: itemType,
+      parent: null,
+      deleted: { $ne: true },
+      dead: { $ne: true },
+    })
+      .sort(sort)
+      .skip(offset)
+      .limit(limit)
+      .lean();
     return res.json({ type, page, count: items.length, items });
   } catch (err) {
     return res.status(500).json({ message: 'Failed to read stories' });
@@ -32,13 +69,21 @@ async function getStories(req, res) {
 }
 
 async function getItem(req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ message: 'Invalid item id' });
+  }
   try {
-    const data = await readMockJson(`${req.params.id}.json`);
-    // Mock stores items as [story, ...comments]; pass through under { item } envelope.
-    const item = Array.isArray(data) ? data : [data];
-    return res.json({ item });
+    const root = await Item.findOne({ id }).lean();
+    if (!root) {
+      return res.status(404).json({ message: `Item ${id} not found` });
+    }
+    
+    const comments = await buildCommentTree(id, 1);
+    root.kids = [];
+    return res.json({ item: [root, ...comments] });
   } catch (err) {
-    return res.status(404).json({ message: `Item ${req.params.id} not found` });
+    return res.status(500).json({ message: 'Failed to read item' });
   }
 }
 
