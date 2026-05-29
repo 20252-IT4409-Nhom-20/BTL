@@ -44,7 +44,7 @@ jobs:
         JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret-key' }}
 
   deploy-backend:
-    needs: test
+    needs: test-backend
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
     steps:

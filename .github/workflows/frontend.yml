@@ -13,7 +13,7 @@ on:
       - '.github/workflows/frontend.yml'
 
 jobs:
-  test-backend:
+  test-frontend:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -28,8 +28,8 @@ jobs:
     - name: Build
       run: cd fe && npm run build
 
-  deploy-backend:
-    needs: test
+  deploy-frontend:
+    needs: test-frontend
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
     steps:
