@@ -23,19 +23,45 @@ const FEED_SORT = {
 
 const MAX_COMMENT_DEPTH = 6;
 
-async function buildCommentTree(parentId, depth) {
-  if (depth >= MAX_COMMENT_DEPTH) return [];
-  const children = await Item.find({
-    parent: parentId,
-    deleted: { $ne: true },
-    dead: { $ne: true },
-  })
-    .sort({ time: 1 })
-    .lean();
-  for (const child of children) {
-    child.kids = await buildCommentTree(child.id, depth + 1);
+/**
+ * BFS-build comment tree under rootId.
+ * One Mongo query per depth level using { parent: { $in: [...] } } —
+ * O(depth) round-trips instead of O(N).
+ */
+async function buildCommentTree(rootId) {
+  const byId = new Map();
+  let frontier = [rootId];
+  let depth = 0;
+
+  while (frontier.length > 0 && depth < MAX_COMMENT_DEPTH) {
+    const level = await Item.find({
+      parent: { $in: frontier },
+      deleted: { $ne: true },
+      dead: { $ne: true },
+    })
+      .sort({ time: 1 })
+      .lean();
+    if (level.length === 0) break;
+
+    for (const node of level) {
+      node.kids = [];
+      byId.set(node.id, node);
+    }
+    frontier = level.map((n) => n.id);
+    depth += 1;
   }
-  return children;
+
+  // Wire children into their parent's kids array
+  const topLevel = [];
+  for (const node of byId.values()) {
+    if (node.parent === rootId) {
+      topLevel.push(node);
+    } else {
+      const parent = byId.get(node.parent);
+      if (parent) parent.kids.push(node);
+    }
+  }
+  return topLevel;
 }
 
 async function getStories(req, res) {
@@ -79,7 +105,7 @@ async function getItem(req, res) {
       return res.status(404).json({ message: `Item ${id} not found` });
     }
     
-    const comments = await buildCommentTree(id, 1);
+    const comments = await buildCommentTree(id);
     root.kids = [];
     return res.json({ item: [root, ...comments] });
   } catch (err) {
