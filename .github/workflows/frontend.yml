@@ -1,0 +1,42 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'fe/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'fe/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24.x
+        cache: 'npm'
+        cache-dependency-path: fe/package-lock.json
+    - name: Install dependencies
+      run: cd fe && npm ci
+    - name: Build
+      run: cd fe && npm run build
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deployment
+        run: |
+          curl --request POST \
+            --url ${{ secrets.FRONTEND_DEPLOY_HOOK }} \
+            --header 'content-type: application/json'
+        env:
+          FRONTEND_DEPLOY_HOOK: ${{ secrets.FRONTEND_DEPLOY_HOOK }}
