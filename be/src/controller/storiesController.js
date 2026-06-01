@@ -1,15 +1,7 @@
-const fs = require('fs/promises');
-const path = require('path');
+const storiesService = require('../services/storiesService');
 
-const MOCK_DATA_DIR = path.resolve(__dirname, '../../../be-mock/mock_data');
 const STORY_TYPES = new Set(['story', 'ask', 'show', 'job', 'poll']);
 const FEED_TYPES = new Set(['top', 'new', 'best', 'ask', 'show', 'job']);
-
-async function readMockJson(fileName) {
-  const filePath = path.join(MOCK_DATA_DIR, fileName);
-  const raw = await fs.readFile(filePath, 'utf8');
-  return JSON.parse(raw);
-}
 
 async function getStories(req, res) {
   const { type } = req.params;
@@ -19,26 +11,30 @@ async function getStories(req, res) {
 
   const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 30, 1), 100);
   const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
-  const offset = (page - 1) * limit;
 
   try {
-    // Mock data only has topstories; reuse for all feed types until real data lands.
-    const all = await readMockJson('topstories.json');
-    const items = (Array.isArray(all) ? all : []).slice(offset, offset + limit);
-    return res.json({ type, page, count: items.length, items });
+    const stories = await storiesService.getStories(type, page, limit);
+    return res.json(stories);
   } catch (err) {
     return res.status(500).json({ message: 'Failed to read stories' });
   }
 }
 
 async function getItem(req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ message: 'Invalid item id' });
+  }
+
   try {
-    const data = await readMockJson(`${req.params.id}.json`);
-    // Mock stores items as [story, ...comments]; pass through under { item } envelope.
-    const item = Array.isArray(data) ? data : [data];
-    return res.json({ item });
+    const item = await storiesService.getItemWithComments(id);
+    if (!item) {
+      return res.status(404).json({ message: `Item ${req.params.id} not found` });
+    }
+
+    return res.json(item);
   } catch (err) {
-    return res.status(404).json({ message: `Item ${req.params.id} not found` });
+    return res.status(500).json({ message: 'Failed to read item' });
   }
 }
 
