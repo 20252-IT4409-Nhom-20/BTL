@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const ITEM_TYPES = ['job', 'story', 'comment', 'poll', 'pollopt'];
 
+// Stores every Hacker News entity in one collection. The `type` field tells
+// whether a document is a story, comment, job, poll, or poll option.
 const ItemSchema = new mongoose.Schema(
     {
         id: {
@@ -54,6 +56,8 @@ const ItemSchema = new mongoose.Schema(
         },
 
         kids: {
+            // Store child item ids in MongoDB. API services expand these ids
+            // into nested objects before sending data to the frontend.
             type: [Number],
             default: [],
         },
@@ -87,6 +91,7 @@ const ItemSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Feed and comment-tree queries depend on these common access patterns.
 ItemSchema.index({ type: 1, score: -1, time: -1 });
 ItemSchema.index({ parent: 1, time: 1 });
 

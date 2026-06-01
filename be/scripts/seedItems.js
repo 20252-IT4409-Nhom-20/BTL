@@ -9,18 +9,14 @@ const path = require('path');
 
 const MOCK_DATA_DIR = path.resolve(__dirname, '../../be-mock/mock_data');
 
-
+// Read mock responses from disk so they can be converted into MongoDB items.
 async function readJSONFile(fileName) {
     const filePath = path.join(MOCK_DATA_DIR, fileName);
     const raw = await fs.promises.readFile(filePath, 'utf-8');
     return JSON.parse(raw);
 }
-seedItems().catch((err) => {
-    console.error(err);
-    process.exitCode = 1;
-});
 
-
+// Convert one raw mock item into the flat shape used by ItemModel.
 function normalizeItem(raw, parentId) {
     const kids = Array.isArray(raw.kids)
         ? raw.kids.map((kid) => (typeof kid === 'number' ? kid : kid.id))
@@ -49,7 +45,7 @@ function normalizeItem(raw, parentId) {
     };
 }
 
-
+// Walk nested mock comments and collect every comment as a separate DB item.
 function flattenItem(raw, parentId, result = []) {
     if (!raw || typeof raw.id !== 'number') {
         return result;
@@ -77,6 +73,8 @@ async function seedItems() {
 
     const flattened = [];
 
+    // The mock item endpoint stores data as [story, ...topLevelComments].
+    // In MongoDB, the story keeps only top-level comment ids in `kids`.
     flattened.push(
         normalizeItem({
             ...story,
@@ -109,3 +107,8 @@ async function seedItems() {
 
     await mongoose.disconnect();
 }
+
+seedItems().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+});
