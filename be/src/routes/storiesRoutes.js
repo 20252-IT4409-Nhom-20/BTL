@@ -10,7 +10,7 @@ router.get('/stories/:type', storiesController.getStories);
 
 // Write endpoints (PR21 shape, auth-gated)
 router.post('/stories', auth, storiesController.createStory);
-router.post('/stories/:id/comment', auth, storiesController.createComment);
+router.post('/stories/:id/comments', auth, storiesController.createComment);
 router.put('/stories/:id/vote', auth, storiesController.voteStory);
 router.delete('/stories/:id', auth, storiesController.deleteStory);
 

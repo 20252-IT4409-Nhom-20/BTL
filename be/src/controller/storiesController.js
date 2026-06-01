@@ -1,6 +1,6 @@
 const storiesService = require('../services/storiesService');
 
-const STORY_TYPES = new Set(['story', 'ask', 'show', 'job', 'poll']);
+const CREATABLE_STORY_TYPES = new Set(['story', 'job', 'poll']);
 const FEED_TYPES = new Set(['top', 'new', 'best', 'ask', 'show', 'job']);
 
 async function getStories(req, res) {
@@ -45,10 +45,9 @@ function createStory(req, res) {
     return res.status(400).json({ message: 'Title is required' });
   }
 
-  if (!STORY_TYPES.has(type)) {
+  if (!CREATABLE_STORY_TYPES.has(type)) {
     return res.status(400).json({ message: 'Invalid story type' });
   }
-
   if (!url && !text) {
     return res.status(400).json({ message: 'Either url or text is required' });
   }
