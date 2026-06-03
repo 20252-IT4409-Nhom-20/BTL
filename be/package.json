@@ -6,7 +6,9 @@
   "scripts": {
     "test": "jest --runInBand",
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "seed:items": "node scripts/seedItems.js",
+    "seed:hn": "node scripts/seedFromHN.js"
   },
   "keywords": [],
   "author": "",
