@@ -1,0 +1,25 @@
+name: Deploy Frontend to Render
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'fe/src/**'
+      - 'fe/package*.json'
+      - 'fe/vite.config.js'
+      - '.github/workflows/deploy-frontend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger Render deployment
+        run: |
+          curl --request POST \
+            --url ${{ secrets.FRONTEND_DEPLOY_HOOK }} \
+            --header 'content-type: application/json'
+        env:
+          FRONTEND_DEPLOY_HOOK: ${{ secrets.FRONTEND_DEPLOY_HOOK }}

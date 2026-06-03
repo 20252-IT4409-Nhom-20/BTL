@@ -1,0 +1,25 @@
+name: Deploy Backend to Render
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'be/src/**'
+      - 'be/package*.json'
+      - 'be/Dockerfile'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger Render deployment
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BACKEND_DEPLOY_HOOK }} \
+            --header 'content-type: application/json'
+        env:
+          BACKEND_DEPLOY_HOOK: ${{ secrets.BACKEND_DEPLOY_HOOK }}

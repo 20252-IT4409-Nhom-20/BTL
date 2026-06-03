@@ -1,0 +1,72 @@
+1. Frontend UI & Structure
+*   Semantic HTML (header, nav, main, footer, article, section)
+*   Forms & Basic Inputs (text, radio, select, multiple select, textarea)
+*   Multimedia Integration (images with alt text, video, audio)
+*   CSS Presentation
+    *   Selectors & Specificity Hierarchy
+    *   Box Model (Content, Padding, Border, Margin)
+    *   Flexbox Layout System
+    *   Responsive Design (Media Queries)
+    *   CSS Frameworks (Tailwind CSS utility classes)
+*   SEO Optimization (Descriptive titles, Meta descriptions, <h1>-<h6> hierarchy)
+
+2. Client-Side Interaction (JavaScript)
+*   DOM Manipulation (Element selection, attribute modification, node creation)
+*   Event Handling (Click, Keyboard, Form Submit, Mouse events)
+    *   Event Delegation
+    *   Event Object handling (preventDefault)
+*   Data Handling (JSON stringify and parse)
+*   Asynchronous Operations
+    *   Fetch API
+    *   Promises & Callbacks
+    *   Async/Await syntax
+*   Timer Management (setTimeout, setInterval)
+
+3. React Framework Features
+*   JSX Syntax
+*   Virtual DOM (Diffing and Patching)
+*   Component-Based Architecture
+    *   Functional Components
+    *   Props (Immutable data passing)
+*   Hooks
+    *   useState (Local state management)
+    *   useEffect (Side effects and lifecycle cleanup)
+    *   useContext (Shared global state)
+*   React Router (SPA Routing, Link navigation)
+*   Context API (Global data sharing)
+
+4. Backend (Server-Side)
+*   Node.js Runtime
+*   Express.js Framework
+    *   HTTP Server & Routing
+    *   Middleware
+*   RESTful Web API Design
+    *   Resource Naming Conventions
+    *   JSON Response Handling
+*   Environment Configuration (.env / dotenv)
+*   Architecture & Folder Structure
+    *   Routes & Controllers
+    *   Services & Repositories
+    *   Models & Validations
+
+5. Database (MongoDB & Mongoose)
+*   NoSQL Data Storage (Documents and BSON)
+*   Cloud Hosting (MongoDB Atlas)
+*   Mongoose ODM
+    *   Schema Definitions (String, Number, Boolean, Date)
+    *   Models
+*   CRUD Operations
+    *   Create (Model.create)
+    *   Read (find, findById)
+    *   Update (findByIdAndUpdate)
+    *   Delete (findByIdAndDelete)
+
+6. Security & Infrastructure
+*   Authentication & Authorization
+*   Security Best Practices
+    *   Input Validation
+    *   NoSQL Injection Prevention (Operator sanitization)
+*   Development Tools
+    *   NPM Package Management (Dependencies vs. DevDependencies)
+    *   Vite Build Tool
+    *   Postman for API Testing

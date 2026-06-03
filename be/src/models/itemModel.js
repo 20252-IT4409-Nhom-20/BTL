@@ -1,76 +1,101 @@
 const mongoose = require('mongoose');
 
-const ITEM_TYPES = ['story', 'comment', 'ask', 'show', 'job', 'poll', 'pollopt'];
+const ITEM_TYPES = ['job', 'story', 'comment', 'poll', 'pollopt'];
 
+// Stores every Hacker News entity in one collection. The `type` field tells
+// whether a document is a story, comment, job, poll, or poll option.
 const ItemSchema = new mongoose.Schema(
-  {
-    id: {
-      type: Number,
-      required: true,
-      unique: true,
-      index: true,
+    {
+        id: {
+            type: Number,
+            required: true,
+            unique: true,
+            index: true,
+        },
+
+        deleted: {
+            type: Boolean,
+            default: false,
+        },
+
+        type: {
+            type: String,
+            enum: ITEM_TYPES,
+            required: true,
+            index: true,
+        },
+
+        by: {
+            type: String,
+            trim: true,
+            index: true,
+        },
+
+        time: {
+            type: Number,
+            index: true,
+        },
+
+        text: {
+            type: String,
+            default: '',
+        },
+
+        dead: {
+            type: Boolean,
+            default: false,
+        },
+
+        parent: {
+            type: Number,
+            index: true,
+        },
+
+        poll: {
+            type: Number,
+        },
+
+        kids: {
+            // Store child item ids in MongoDB. API services expand these ids
+            // into nested objects before sending data to the frontend.
+            type: [Number],
+            default: [],
+        },
+
+        url: {
+            type: String,
+            trim: true,
+        },
+
+        score: {
+            type: Number,
+            default: 0,
+            index: true,
+        },
+
+        title: {
+            type: String,
+            trim: true,
+        },
+
+        parts: {
+            type: [Number],
+            default: [],
+        },
+
+        descendants: {
+            type: Number,
+            default: 0,
+        },
     },
-    type: {
-      type: String,
-      enum: ITEM_TYPES,
-      default: 'story',
-      index: true,
-    },
-    by: {
-      type: String,
-      default: '',
-      index: true,
-    },
-    time: {
-      type: Number,
-      default: () => Math.floor(Date.now() / 1000),
-      index: true,
-    },
-    title: {
-      type: String,
-      default: '',
-    },
-    url: {
-      type: String,
-      default: '',
-    },
-    text: {
-      type: String,
-      default: '',
-    },
-    parent: {
-      type: Number,
-      default: null,
-      index: true,
-    },
-    kids: {
-      type: [Number],
-      default: [],
-    },
-    score: {
-      type: Number,
-      default: 0,
-      index: true,
-    },
-    descendants: {
-      type: Number,
-      default: 0,
-    },
-    dead: {
-      type: Boolean,
-      default: false,
-    },
-    deleted: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
 
-ItemSchema.index({ type: 1, score: -1 });
-ItemSchema.index({ type: 1, time: -1 });
+// Feed and comment-tree queries depend on these common access patterns.
+ItemSchema.index({ type: 1, score: -1, time: -1 });
+ItemSchema.index({ parent: 1, time: 1 });
 
 const Item = mongoose.model('Item', ItemSchema);
+
 module.exports = Item;
 module.exports.ITEM_TYPES = ITEM_TYPES;
