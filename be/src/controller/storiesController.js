@@ -12,9 +12,6 @@ async function getStories(req, res) {
   const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 30, 1), 100);
   const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
 
-  const itemType = FEED_TYPE_TO_ITEM_TYPE[type];
-  const sort = FEED_SORT[type] || { score: -1 };
-
   try {
     const stories = await storiesService.getStories(type, page, limit);
     return res.json(stories);
