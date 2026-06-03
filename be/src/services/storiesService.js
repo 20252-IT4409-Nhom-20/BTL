@@ -1,5 +1,7 @@
 const Item = require('../models/itemModel');
 
+const MAX_COMMENT_DEPTH = 6;
+
 // Translate a feed name from the route into a MongoDB query.
 function getFeedQuery(type) {
     if (type === 'job') {
@@ -58,22 +60,48 @@ async function getStories(type, page = 1, limit = 30) {
     };
 }
 
-// Expand child ids into nested comment objects for the frontend comment page.
-async function buildCommentTree(ids = []) {
-    if (!ids.length) return [];
+// Build comment tree with one Mongo query per depth level instead of one per node.
+async function buildCommentTree(rootId) {
+    const byId = new Map();
+    let frontier = [rootId];
+    let depth = 0;
 
-    const comments = await Item.find({ id: { $in: ids } }).lean();
-    const byId = new Map(comments.map((comment) => [comment.id, comment]));
+    while (frontier.length > 0 && depth < MAX_COMMENT_DEPTH) {
+        const level = await Item.find({
+            parent: { $in: frontier },
+            deleted: { $ne: true },
+            dead: { $ne: true },
+        })
+            .sort({ time: 1 })
+            .lean();
 
-    return Promise.all(
-        ids
-            .map((id) => byId.get(id))
-            .filter(Boolean)
-            .map(async (comment) => ({
-                ...comment,
-                kids: await buildCommentTree(comment.kids || []),
-            }))
-    );
+        if (level.length === 0) {
+            break;
+        }
+
+        for (const comment of level) {
+            byId.set(comment.id, { ...comment, kids: [] });
+        }
+
+        frontier = level.map((comment) => comment.id);
+        depth += 1;
+    }
+
+    const topLevel = [];
+
+    for (const comment of byId.values()) {
+        if (comment.parent === rootId) {
+            topLevel.push(comment);
+            continue;
+        }
+
+        const parent = byId.get(comment.parent);
+        if (parent) {
+            parent.kids.push(comment);
+        }
+    }
+
+    return topLevel;
 }
 
 // Return the story and its top-level comments in the shape currently used by FE.
@@ -84,7 +112,7 @@ async function getItemWithComments(id) {
         return null;
     }
 
-    const comments = await buildCommentTree(story.kids || []);
+    const comments = await buildCommentTree(story.id);
 
     return {
         item: [
