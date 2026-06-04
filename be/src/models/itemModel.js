@@ -8,9 +8,10 @@ const ItemSchema = new mongoose.Schema(
     {
         id: {
             type: Number,
-            required: true,
+            required: false,
             unique: true,
             index: true,
+            sparse: true,
         },
 
         deleted: {
@@ -47,8 +48,9 @@ const ItemSchema = new mongoose.Schema(
         },
 
         parent: {
-            type: Number,
+            type: mongoose.Schema.Types.ObjectId,
             index: true,
+            ref: 'Item',
         },
 
         poll: {
@@ -58,7 +60,8 @@ const ItemSchema = new mongoose.Schema(
         kids: {
             // Store child item ids in MongoDB. API services expand these ids
             // into nested objects before sending data to the frontend.
-            type: [Number],
+            type: [mongoose.Schema.Types.ObjectId],
+            ref: 'Item',
             default: [],
         },
 
