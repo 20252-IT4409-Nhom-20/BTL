@@ -44,7 +44,8 @@ describe('Stories API', () => {
             .post('/comments')
             .send({
                 text: 'Test comment',
-                parent_id: story._id
+                parent_id: story._id,
+                root_id: story._id
             });
 
         expect(response.statusCode).toBe(201);
@@ -54,6 +55,7 @@ describe('Stories API', () => {
         // Verify parent has updated kids array
         const updatedStory = await Item.findById(story._id);
         expect(updatedStory.kids.map(id => id.toString())).toContain(response.body._id);
+        expect(updatedStory.descendants).toBe(1);
     });
 
     it('should fetch item with comments', async () => {
