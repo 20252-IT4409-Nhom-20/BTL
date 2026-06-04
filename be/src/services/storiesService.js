@@ -1,4 +1,5 @@
 const Item = require('../models/itemModel');
+const mongoose = require('mongoose');
 
 const MAX_COMMENT_DEPTH = 6;
 
@@ -80,22 +81,22 @@ async function buildCommentTree(rootId) {
         }
 
         for (const comment of level) {
-            byId.set(comment.id, { ...comment, kids: [] });
+            byId.set(comment._id.toString(), { ...comment, kids: [] });
         }
 
-        frontier = level.map((comment) => comment.id);
+        frontier = level.map((comment) => comment._id);
         depth += 1;
     }
 
     const topLevel = [];
 
     for (const comment of byId.values()) {
-        if (comment.parent === rootId) {
+        if (comment.parent && comment.parent.toString() === rootId.toString()) {
             topLevel.push(comment);
             continue;
         }
 
-        const parent = byId.get(comment.parent);
+        const parent = byId.get(comment.parent ? comment.parent.toString() : '');
         if (parent) {
             parent.kids.push(comment);
         }
@@ -106,13 +107,14 @@ async function buildCommentTree(rootId) {
 
 // Return the story and its top-level comments in the shape currently used by FE.
 async function getItemWithComments(id) {
-    const story = await Item.findOne({ id }).lean();
+    const query = mongoose.Types.ObjectId.isValid(id) ? { _id: id } : { id };
+    const story = await Item.findOne(query).lean();
 
     if (!story) {
         return null;
     }
 
-    const comments = await buildCommentTree(story.id);
+    const comments = await buildCommentTree(story._id);
 
     return {
         item: [
@@ -125,7 +127,50 @@ async function getItemWithComments(id) {
     };
 }
 
+async function createStory(data) {
+    const story = new Item({
+        ...data,
+        type: 'story',
+        descendants: 0,
+        kids: [],
+        time: Math.floor(Date.now() / 1000),
+    });
+    return await story.save();
+}
+
+async function createComment(data) {
+    const { parentId, rootId, text, by } = data;
+    
+    // Create the comment
+    const comment = new Item({
+        type: 'comment',
+        text,
+        by,
+        parent: parentId,
+        time: Math.floor(Date.now() / 1000),
+    });
+    const savedComment = await comment.save();
+
+    // 1. Update the immediate parent's kids array
+    await Item.updateOne(
+        { _id: parentId },
+        { $push: { kids: savedComment._id } }
+    );
+    
+    // 2. Increment descendants count on the root story
+    if (rootId) {
+        await Item.updateOne(
+            { _id: rootId },
+            { $inc: { descendants: 1 } }
+        );
+    }
+    
+    return savedComment;
+}
+
 module.exports = {
     getStories,
     getItemWithComments,
+    createStory,
+    createComment,
 };
