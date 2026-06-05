@@ -49,7 +49,7 @@ export default function StoriesPage() {
       <table>
         <tbody>
           {items?.map((item, index) => (
-            <Story key={item.id} item={item} rank={index + 1} />
+            <Story key={item._id} item={item} rank={index + 1} />
           ))}
         </tbody>
       </table>

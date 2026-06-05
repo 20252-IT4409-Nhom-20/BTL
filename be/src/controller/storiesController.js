@@ -21,15 +21,12 @@ async function getStories(req, res) {
 }
 
 async function getItem(req, res) {
-  const id = parseInt(req.params.id, 10);
-  if (!Number.isFinite(id)) {
-    return res.status(400).json({ message: 'Invalid item id' });
-  }
-
+  const id = req.params.id;
+  
   try {
     const item = await storiesService.getItemWithComments(id);
     if (!item) {
-      return res.status(404).json({ message: `Item ${req.params.id} not found` });
+      return res.status(404).json({ message: `Item ${id} not found` });
     }
 
     return res.json(item);
@@ -38,7 +35,7 @@ async function getItem(req, res) {
   }
 }
 
-function createStory(req, res) {
+async function createStory(req, res) {
   const { title, url, text, type = 'story' } = req.body || {};
 
   if (!title || typeof title !== 'string' || !title.trim()) {
@@ -52,45 +49,43 @@ function createStory(req, res) {
     return res.status(400).json({ message: 'Either url or text is required' });
   }
 
-  const now = Math.floor(Date.now() / 1000);
-
-  return res.status(201).json({
-    message: 'Story creation placeholder. Persist this to the database later.',
-    story: {
-      id: now,
-      type,
-      title: title.trim(),
-      url: url || undefined,
-      text: text || undefined,
-      by: req.user?.id || 'authenticated-user',
-      time: now,
-      score: 0,
-      descendants: 0,
-    },
-  });
+  try {
+    const story = await storiesService.createStory({
+        title,
+        url,
+        text,
+        type,
+        by: req.user?.username || 'anonymous'
+    });
+    return res.status(201).json(story);
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to create story' });
+  }
 }
 
-function createComment(req, res) {
-  const { text, parent_id: parentId } = req.body || {};
+async function createComment(req, res) {
+  const { text, parent_id: parentId, root_id: rootId } = req.body || {};
 
   if (!text || typeof text !== 'string' || !text.trim()) {
     return res.status(400).json({ message: 'Comment text is required' });
   }
 
-  const now = Math.floor(Date.now() / 1000);
+  if (!parentId) {
+    return res.status(400).json({ message: 'Parent ID is required' });
+  }
 
-  return res.status(201).json({
-    message: 'Comment creation placeholder. Persist this to the database later.',
-    comment: {
-      id: now,
-      type: 'comment',
-      by: req.user?.id || 'authenticated-user',
-      time: now,
-      text: text.trim(),
-      parent: Number(parentId || req.params.id),
-      kids: [],
-    },
-  });
+  try {
+    const comment = await storiesService.createComment({
+        text,
+        parentId,
+        rootId,
+        by: req.user?.username || 'anonymous'
+    });
+    return res.status(201).json(comment);
+  } catch (err) {
+    console.error('[CreateComment Error]:', err);
+    return res.status(500).json({ message: 'Failed to create comment', error: err.message });
+  }
 }
 
 function voteStory(req, res) {

@@ -6,12 +6,6 @@ const ITEM_TYPES = ['job', 'story', 'comment', 'poll', 'pollopt'];
 // whether a document is a story, comment, job, poll, or poll option.
 const ItemSchema = new mongoose.Schema(
     {
-        id: {
-            type: Number,
-            required: true,
-            unique: true,
-            index: true,
-        },
 
         deleted: {
             type: Boolean,
@@ -47,8 +41,9 @@ const ItemSchema = new mongoose.Schema(
         },
 
         parent: {
-            type: Number,
+            type: mongoose.Schema.Types.ObjectId,
             index: true,
+            ref: 'Item',
         },
 
         poll: {
@@ -58,7 +53,8 @@ const ItemSchema = new mongoose.Schema(
         kids: {
             // Store child item ids in MongoDB. API services expand these ids
             // into nested objects before sending data to the frontend.
-            type: [Number],
+            type: [mongoose.Schema.Types.ObjectId],
+            ref: 'Item',
             default: [],
         },
 
