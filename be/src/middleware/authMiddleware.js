@@ -16,7 +16,7 @@ module.exports = async function authMiddleware(req, res, next) {
       return res.status(401).json({ message: 'Invalid token payload' });
     }
 
-    const user = await User.findById(userId).select('role isBanned');
+    const user = await User.findById(userId).select('username role isBanned');
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
@@ -28,6 +28,7 @@ module.exports = async function authMiddleware(req, res, next) {
     req.userId = userId;
     req.user = {
       id: userId,
+      username: user.username,
       role: user.role || decoded?.role || 'user',
     };
 
