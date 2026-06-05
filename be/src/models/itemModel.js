@@ -6,13 +6,6 @@ const ITEM_TYPES = ['job', 'story', 'comment', 'poll', 'pollopt'];
 // whether a document is a story, comment, job, poll, or poll option.
 const ItemSchema = new mongoose.Schema(
     {
-        id: {
-            type: Number,
-            required: false,
-            unique: true,
-            index: true,
-            sparse: true,
-        },
 
         deleted: {
             type: Boolean,

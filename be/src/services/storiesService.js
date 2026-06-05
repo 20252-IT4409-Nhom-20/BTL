@@ -107,8 +107,7 @@ async function buildCommentTree(rootId) {
 
 // Return the story and its top-level comments in the shape currently used by FE.
 async function getItemWithComments(id) {
-    const query = mongoose.Types.ObjectId.isValid(id) ? { _id: id } : { id };
-    const story = await Item.findOne(query).lean();
+    const story = await Item.findById(id).lean();
 
     if (!story) {
         return null;
