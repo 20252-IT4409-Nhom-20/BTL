@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { timeFormatter } from '@/lib/timeFormatter';
 import type { hnItem } from '@/types/hnItem';
+import DOMPurify from 'dompurify';
 
 interface CommentProps {
   comment: hnItem;
@@ -23,21 +24,21 @@ export default function Comment({ comment, depth }: CommentProps) {
           <article className="hn-comment" style={depthStyle}>
             <div className="comment-meta">
               <span className="votearrow">▲</span>{' '}
-              <a href={`/item/${comment.id}`}>{comment.by ?? 'unknown'}</a>{' '}
+              <a href={`/item/${comment.id || comment._id}`}>{comment.by ?? 'unknown'}</a>{' '}
               {timeFormatter(comment.time)} | parent | next [–]
             </div>
             <div
               className="comment-body text-wrap"
-              dangerouslySetInnerHTML={{ __html: comment.text ?? '[deleted]' }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment.text ?? '[deleted]') }}
             />
             <div className="comment-actions">
-              <a href={`/item/${comment.id}`}>reply</a>
+              <a href={`/item/${comment.id || comment._id}`}>reply</a>
             </div>
           </article>
         </td>
       </tr>
       {replies.map((kid) => (
-        <Comment key={kid.id} comment={kid} depth={depth + 1} />
+        <Comment key={kid.id || kid._id} comment={kid} depth={depth + 1} />
       ))}
     </>
   );
