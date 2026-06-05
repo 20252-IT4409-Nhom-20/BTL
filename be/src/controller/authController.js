@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const auth = require('../middleware/authMiddleware');
+const { serializePrivateUser } = require('../services/userSerializer');
 
 const router = express.Router();
 
@@ -21,8 +22,7 @@ router.post('/register', async (req, res) => {
     }
 
     const newUser = await User.create({ username, email: normalizedEmail, password, role: 'user' });
-    const userResponse = newUser.toObject();
-    delete userResponse.password;
+    const userResponse = serializePrivateUser(newUser);
 
     return res.status(201).json({ message: 'User registered successfully', user: userResponse });
   } catch (err) {
@@ -60,8 +60,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const userResponse = user.toObject();
-    delete userResponse.password;
+    const userResponse = serializePrivateUser(user);
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
@@ -79,7 +78,7 @@ router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
-    return res.json({ user });
+    return res.json({ user: serializePrivateUser(user) });
   } catch (err) {
     return res.status(500).json({ message: 'Server error' });
   }
