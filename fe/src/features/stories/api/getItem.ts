@@ -9,11 +9,11 @@ export const fetchItem = async (id: number): Promise<hnItem[]> => {
   return data.item;
 };
 
-export const useItem = (id: number | null) => {
+export const useItem = (id: string | number | null) => {
   return useQuery({
     queryKey: ['item', id],
-    queryFn: () => fetchItem(id as number),
-    enabled: typeof id === 'number' && id > 0,
+    queryFn: () => fetchItem(id as any),
+    enabled: !!id,
     staleTime: 30000,
   });
 };
