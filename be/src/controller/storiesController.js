@@ -83,7 +83,8 @@ async function createComment(req, res) {
     });
     return res.status(201).json(comment);
   } catch (err) {
-    return res.status(500).json({ message: 'Failed to create comment' });
+    console.error('[CreateComment Error]:', err);
+    return res.status(500).json({ message: 'Failed to create comment', error: err.message });
   }
 }
 
