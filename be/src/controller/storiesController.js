@@ -1,4 +1,5 @@
 const storiesService = require('../services/storiesService');
+const voteService = require('../services/voteService');
 
 const CREATABLE_STORY_TYPES = new Set(['story', 'job', 'poll']);
 const FEED_TYPES = new Set(['top', 'new', 'best', 'ask', 'show', 'job']);
@@ -88,13 +89,37 @@ async function createComment(req, res) {
   }
 }
 
-function voteStory(req, res) {
-  return res.json({
-    message: 'Vote placeholder. Toggle the authenticated user vote in the database later.',
-    storyId: Number(req.params.id),
-    voted: true,
-    scoreDelta: 1,
-  });
+async function voteStory(req, res) {
+  try {
+    const result = await voteService.castVote({
+      userId: req.userId,
+      itemId: req.params.id,
+      direction: req.body?.direction,
+    });
+    return res.json(result);
+  } catch (err) {
+    if (err instanceof voteService.VoteError) {
+      return res.status(err.status).json({ message: err.message, code: err.code });
+    }
+    console.error('[VoteStory Error]:', err);
+    return res.status(500).json({ message: 'Failed to record vote' });
+  }
+}
+
+async function getVote(req, res) {
+  try {
+    const result = await voteService.getVoteState({
+      userId: req.userId,
+      itemId: req.params.id,
+    });
+    return res.json(result);
+  } catch (err) {
+    if (err instanceof voteService.VoteError) {
+      return res.status(err.status).json({ message: err.message, code: err.code });
+    }
+    console.error('[GetVote Error]:', err);
+    return res.status(500).json({ message: 'Failed to read vote state' });
+  }
 }
 
 function deleteStory(req, res) {
@@ -111,5 +136,6 @@ module.exports = {
   createStory,
   createComment,
   voteStory,
+  getVote,
   deleteStory,
 };
