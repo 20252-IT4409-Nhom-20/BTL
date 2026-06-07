@@ -97,12 +97,37 @@ function voteStory(req, res) {
   });
 }
 
-function deleteStory(req, res) {
-  return res.json({
-    message: 'Delete story placeholder. Enforce author/admin ownership in the database later.',
-    storyId: Number(req.params.id),
-    deleted: true,
-  });
+async function deleteStory(req, res) {
+  try {
+    const result = await storiesService.deleteItem({
+      itemId: req.params.id,
+      actor: req.user,
+    });
+    return res.json(result);
+  } catch (err) {
+    if (err instanceof storiesService.StoriesServiceError) {
+      return res.status(err.status).json({ message: err.message, code: err.code });
+    }
+    console.error('[DeleteStory Error]:', err);
+    return res.status(500).json({ message: 'Failed to delete item' });
+  }
+}
+
+async function editItem(req, res) {
+  try {
+    const item = await storiesService.editItem({
+      itemId: req.params.id,
+      updates: req.body || {},
+      actor: req.user,
+    });
+    return res.json(item);
+  } catch (err) {
+    if (err instanceof storiesService.StoriesServiceError) {
+      return res.status(err.status).json({ message: err.message, code: err.code });
+    }
+    console.error('[EditItem Error]:', err);
+    return res.status(500).json({ message: 'Failed to edit item' });
+  }
 }
 
 module.exports = {
@@ -112,4 +137,5 @@ module.exports = {
   createComment,
   voteStory,
   deleteStory,
+  editItem,
 };

@@ -13,5 +13,11 @@ router.post('/stories', auth, storiesController.createStory);
 router.post('/comments', auth, storiesController.createComment);
 router.put('/stories/:id/vote', auth, storiesController.voteStory);
 router.delete('/stories/:id', auth, storiesController.deleteStory);
+router.delete('/items/:id', auth, storiesController.deleteStory);
+// PATCH for partial updates (text/title/url). Items can be stories or
+// comments, so the same handler covers all three aliases.
+router.patch('/stories/:id', auth, storiesController.editItem);
+router.patch('/items/:id', auth, storiesController.editItem);
+router.patch('/comments/:id', auth, storiesController.editItem);
 
 module.exports = router;

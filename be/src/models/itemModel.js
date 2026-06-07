@@ -83,6 +83,17 @@ const ItemSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+
+        editedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
+
+        editedAt: {
+            type: Date,
+            default: null,
+        },
     },
     { timestamps: true }
 );
