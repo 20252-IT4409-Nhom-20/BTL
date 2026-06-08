@@ -3,7 +3,7 @@ const Item = require('../models/itemModel');
 const { serializePublicUser } = require('./userSerializer');
 
 async function getUserStats(username) {
-    const [submissions, comments, karmaResult] = await Promise.all([
+    const [submissions, comments] = await Promise.all([
         Item.countDocuments({
             by: username,
             type: 'story',
@@ -16,27 +16,11 @@ async function getUserStats(username) {
             deleted: { $ne: true },
             dead: { $ne: true },
         }),
-        Item.aggregate([
-            {
-                $match: {
-                    by: username,
-                    deleted: { $ne: true },
-                    dead: { $ne: true },
-                },
-            },
-            {
-                $group: {
-                    _id: null,
-                    total: { $sum: '$score' },
-                },
-            },
-        ]),
     ]);
 
     return {
         submissions,
         comments,
-        karma: karmaResult[0]?.total || 0,
     };
 }
 

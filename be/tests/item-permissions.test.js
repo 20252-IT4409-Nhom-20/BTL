@@ -9,7 +9,7 @@ beforeAll(async () => await dbHandler.connect());
 afterEach(async () => await dbHandler.clearDatabase());
 afterAll(async () => await dbHandler.closeDatabase());
 
-describe('authorizationService', () => {
+describe('item permission helpers', () => {
   it('allows the item owner to modify an item', () => {
     const user = { username: 'alice', role: 'user' };
     const item = { by: 'alice' };

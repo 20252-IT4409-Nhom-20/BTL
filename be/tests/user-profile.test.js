@@ -31,7 +31,6 @@ describe('User Profile API', () => {
         expect(res.body.profile.stats).toEqual({
             submissions: 2,
             comments: 1,
-            karma: 10,
         });
     });
 
