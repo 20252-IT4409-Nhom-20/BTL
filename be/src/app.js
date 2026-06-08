@@ -20,4 +20,8 @@ app.use('/api', storiesRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+app.get('/', (req, res) => {
+    res.redirect('/api-docs');
+});
+
 module.exports = app;
