@@ -66,7 +66,7 @@ async function castVote({ userId, itemId, direction }) {
     const updated = await Item.findByIdAndUpdate(
         itemId,
         { $inc: { score: scoreDelta } },
-        { new: true, select: 'score' }
+        { returnDocument: 'after', select: 'score' }
     );
 
     return {
