@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const authController = require('./controller/authController');
 const storiesRoutes = require('./routes/storiesRoutes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 
 const app = express();
 
@@ -15,5 +17,7 @@ app.use(express.json());
 
 app.use('/api/auth', authController);
 app.use('/api', storiesRoutes);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 module.exports = app;
