@@ -5,6 +5,26 @@ const auth = require('../middleware/authMiddleware');
 const router = express.Router();
 
 // Read endpoints (PR22 shape)
+/**
+ * @openapi
+ * /api/stories/item/{id}:
+ *   get:
+ *     summary: Get a single item and its comments
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The item ID
+ *     responses:
+ *       200:
+ *         description: The item and its comments
+ *       404:
+ *         description: Item not found
+ *       500:
+ *         description: Server error
+ */
 router.get('/stories/item/:id', storiesController.getItem);
 router.get('/stories/:type', storiesController.getStories);
 
