@@ -36,10 +36,27 @@ describe('Auth Endpoints', () => {
         username: 'newuser',
         email: 'test@example.com',
         password: 'password123'
-      });
+    });
     
     expect(res.statusCode).toEqual(400);
-    expect(res.body.message).toEqual('User already exists');
+    expect(res.body).toMatchObject({
+      status: 'error',
+      code: 'USER_EXISTS',
+      message: 'User already exists',
+    });
+  });
+
+  it('should return a structured error for missing credentials', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({});
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toMatchObject({
+      status: 'error',
+      code: 'VALIDATION_ERROR',
+      message: 'Credentials required',
+    });
   });
 
   it('should login an existing user', async () => {
@@ -60,5 +77,16 @@ describe('Auth Endpoints', () => {
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('token');
+  });
+
+  it('should return a structured error for protected routes without auth', async () => {
+    const res = await request(app).get('/api/auth/me');
+
+    expect(res.statusCode).toEqual(401);
+    expect(res.body).toMatchObject({
+      status: 'error',
+      code: 'UNAUTHORIZED',
+      message: 'Missing or invalid Authorization header',
+    });
   });
 });
