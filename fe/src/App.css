@@ -59,6 +59,8 @@
   background: #f6f6ef;
   flex: 1;
   padding: 14px;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .story-list h1 {
@@ -76,6 +78,7 @@
   display: flex;
   gap: 8px;
   padding: 6px 0;
+  min-width: 0;
 }
 
 .story-rank {
@@ -87,11 +90,14 @@
 .story-title {
   color: #000000;
   font-size: 14px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .story-meta {
   color: #6f6f6f;
   font-size: 12px;
+  overflow-wrap: anywhere;
 }
 
 .story-meta a {
@@ -186,6 +192,8 @@ h2 {
   font-size: 13px;
   line-height: 1.45;
   color: #232323;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .comment-text p {
@@ -236,8 +244,43 @@ h2 {
     padding: 10px;
   }
 
+  .story-item {
+    gap: 6px;
+  }
+
+  .story-rank {
+    width: 18px;
+    flex: 0 0 18px;
+  }
+
+  .story-title {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .story-meta,
+  .comment-meta {
+    font-size: 11px;
+  }
+
   h1 {
     font-size: 18px;
+  }
+
+  .error-boundary {
+    margin: 16px 8px;
+    padding: 16px;
+  }
+
+  .empty-state {
+    padding: 20px 8px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .page,
+  .content {
+    max-width: 100%;
   }
 }
 

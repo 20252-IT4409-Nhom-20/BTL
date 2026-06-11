@@ -2,7 +2,9 @@
 
 .nav-table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
 }
 
 .logo-cell {
@@ -20,6 +22,7 @@
   font-size: 10pt;
   color: #222222;
   line-height: 12pt;
+  overflow-wrap: anywhere;
 }
 
 .hnname {
@@ -41,6 +44,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .nav-avatar {
@@ -72,4 +76,30 @@
 
 .nav-logout:hover {
   color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .nav-table,
+  .nav-table tbody,
+  .nav-table tr,
+  .nav-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .logo-cell {
+    display: inline-block;
+    width: auto;
+    padding-right: 4px;
+  }
+
+  .pagetop {
+    display: inline;
+    line-height: 1.5;
+  }
+
+  .nav-user {
+    justify-content: flex-start;
+    margin-top: 4px;
+  }
 }
