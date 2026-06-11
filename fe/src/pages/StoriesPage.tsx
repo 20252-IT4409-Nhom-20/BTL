@@ -31,8 +31,9 @@ export default function StoriesPage() {
     navigate(`/${type}?page=${newPage}&limit=${limit}`);
   };
 
+  const storyItems = items ?? [];
   const canGoPrevious = page > 1;
-  const canGoNext = items && items.length > 0;
+  const canGoNext = storyItems.length > 0;
 
   const handleLimitChange = (newLimit: number) => {
     navigate(`/${type}?page=1&limit=${newLimit}`);
@@ -43,16 +44,21 @@ export default function StoriesPage() {
   }
   if (error) return <div>Error: {error?.message}</div>;
 
+  const hasItems = storyItems.length > 0;
+
   return (
     <div>
-
-      <table>
-        <tbody>
-          {items?.map((item, index) => (
-            <Story key={item._id} item={item} rank={index + 1} />
-          ))}
-        </tbody>
-      </table>
+      {hasItems ? (
+        <table>
+          <tbody>
+            {storyItems.map((item, index) => (
+              <Story key={item._id} item={item} rank={index + 1} />
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="status empty-state">No stories found.</p>
+      )}
 
       <div style={{ textAlign: 'center' }}>
         <button onClick={handlePrevious} disabled={!canGoPrevious}>
@@ -80,7 +86,6 @@ export default function StoriesPage() {
           <option value={50}>50</option>
         </select>
       </div>
-
     </div>
   );
 }

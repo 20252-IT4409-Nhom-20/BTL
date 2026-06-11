@@ -270,3 +270,9 @@ h2 {
 .error-boundary button:hover {
   background: #8f2f2f;
 }
+
+.empty-state {
+  padding: 24px 12px;
+  color: #666;
+  text-align: center;
+}
