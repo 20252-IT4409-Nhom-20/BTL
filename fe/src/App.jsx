@@ -4,18 +4,48 @@ import StoriesPage from '@/pages/StoriesPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import ItemPage from '@/pages/ItemPage';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/item/:id" element={<ItemPage />} />
-          <Route path="/:type" element={<StoriesPage />} />
-          <Route path="/" element={<Navigate to="/news" replace />} />
-        </Route>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/item/:id"
+          element={
+            <ErrorBoundary>
+              <ItemPage />
+            </ErrorBoundary>
+          }
+        />
+
+        <Route
+          path="/:type"
+          element={
+            <ErrorBoundary>
+              <StoriesPage />
+            </ErrorBoundary>
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            <ErrorBoundary>
+              <LoginPage />
+            </ErrorBoundary>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <ErrorBoundary>
+              <RegisterPage />
+            </ErrorBoundary>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );

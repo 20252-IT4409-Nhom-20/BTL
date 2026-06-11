@@ -68,7 +68,7 @@ export default function ItemPage() {
 
       <h2 className="comments-heading">Comments</h2>
       {comments.length === 0 ? (
-        <p className="status">No comments yet</p>
+        <p className="status empty-state">No comments yet.</p>
       ) : (
         <table className="kids-table">
           <tbody>
