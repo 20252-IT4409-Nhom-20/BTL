@@ -3,21 +3,22 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const auth = require('../middleware/authMiddleware');
+const APIError = require('../utils/APIError');
 
 const router = express.Router();
 
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res, next) => {
   const { username, email, password } = req.body;
   const normalizedEmail = String(email || '').trim().toLowerCase();
 
   try {
     if (!username || !normalizedEmail || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
+      throw new APIError(400, 'VALIDATION_ERROR', 'Username, email, and password are required');
     }
 
     const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      throw new APIError(400, 'USER_EXISTS', 'User already exists');
     }
 
     const newUser = await User.create({ username, email: normalizedEmail, password, role: 'user' });
@@ -26,18 +27,18 @@ router.post('/register', async (req, res) => {
 
     return res.status(201).json({ message: 'User registered successfully', user: userResponse });
   } catch (err) {
-    return res.status(500).json({ message: 'Server error!' });
+    return next(err);
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
   const { username, email, password } = req.body;
   const normalizedEmail = String(email || '').trim().toLowerCase();
   const normalizedUsername = String(username || '').trim();
 
   try {
     if (!password || (!normalizedEmail && !normalizedUsername)) {
-      return res.status(400).json({ message: 'Credentials required' });
+      throw new APIError(400, 'VALIDATION_ERROR', 'Credentials required');
     }
 
     const query = normalizedEmail
@@ -45,19 +46,16 @@ router.post('/login', async (req, res) => {
       : { username: normalizedUsername };
     const user = await User.findOne(query);
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      throw new APIError(400, 'INVALID_CREDENTIALS', 'Invalid credentials');
     }
 
     if (user.isBanned) {
-      return res.status(403).json({
-        message: user.banReason ? `Account is banned: ${user.banReason}` : 'Account is banned',
-        code: 'USER_BANNED',
-      });
+      throw new APIError(403, 'USER_BANNED', user.banReason ? `Account is banned: ${user.banReason}` : 'Account is banned');
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      throw new APIError(400, 'INVALID_CREDENTIALS', 'Invalid credentials');
     }
 
     const userResponse = user.toObject();
@@ -71,17 +69,17 @@ router.post('/login', async (req, res) => {
 
     return res.json({ message: 'Login successful', token, user: userResponse });
   } catch (err) {
-    return res.status(500).json({ message: 'Server error' });
+    return next(err);
   }
 });
 
-router.get('/me', auth, async (req, res) => {
+router.get('/me', auth, async (req, res, next) => {
   try {
     const user = await User.findById(req.userId).select('-password');
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) throw new APIError(404, 'USER_NOT_FOUND', 'User not found');
     return res.json({ user });
   } catch (err) {
-    return res.status(500).json({ message: 'Server error' });
+    return next(err);
   }
 });
 
