@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const authController = require('./controller/authController');
 const storiesRoutes = require('./routes/storiesRoutes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 
 const app = express();
 
@@ -35,5 +37,11 @@ app.use(pinoHttp({
 app.use('/api/auth', authController);
 app.use('/api', storiesRoutes);
 app.use(errorHandler);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.get('/', (req, res) => {
+    res.redirect('/api-docs');
+});
 
 module.exports = app;
