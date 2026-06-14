@@ -14,8 +14,12 @@ const options = {
     },
     servers: [
       {
+        url: `https://btl-be.onrender.com`,
+        description: "Production server",
+      },
+      {
         url: `http://localhost:${port}`,
-        description: "Development server",
+        description: "Development server (uses same db)",
       },
     ],
   },
