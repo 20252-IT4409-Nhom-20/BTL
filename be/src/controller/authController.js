@@ -7,6 +7,29 @@ const APIError = require('../utils/APIError');
 
 const router = express.Router();
 
+/**
+ * @openapi
+ * /api/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [username, email, password]
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User registered
+ */
 router.post('/register', async (req, res, next) => {
   const { username, email, password } = req.body;
   const normalizedEmail = String(email || '').trim().toLowerCase();
@@ -31,6 +54,35 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     summary: Login to get an access token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ */
 router.post('/login', async (req, res, next) => {
   const { username, email, password } = req.body;
   const normalizedEmail = String(email || '').trim().toLowerCase();
@@ -73,6 +125,17 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/auth/me:
+ *   get:
+ *     summary: Get current user profile
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile
+ */
 router.get('/me', auth, async (req, res, next) => {
   try {
     const user = await User.findById(req.userId).select('-password');
