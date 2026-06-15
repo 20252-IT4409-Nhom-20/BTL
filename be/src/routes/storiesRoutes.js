@@ -26,6 +26,8 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
+router.get("/stories/item/:id", storiesController.getItem);
+
 /**
  * @openapi
  * /api/stories/{type}:
