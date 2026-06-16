@@ -1,11 +1,6 @@
-import { authApi, setToken, clearToken } from '@/lib/auth-client';
+import { authApi, setToken, setUser, clearAuth, type StoredUser } from '@/lib/auth-client';
 
-export type User = {
-  _id: string;
-  username: string;
-  email: string;
-  role: string;
-};
+export type User = StoredUser;
 
 type LoginResponse = { message: string; token: string; user: User };
 type RegisterResponse = { message: string; user: User };
@@ -14,6 +9,7 @@ type MeResponse = { user: User };
 export async function login(credentials: { username?: string; email?: string; password: string }) {
   const data = (await authApi.post('/auth/login', credentials)) as unknown as LoginResponse;
   setToken(data.token);
+  setUser(data.user);
   return data;
 }
 
@@ -22,9 +18,11 @@ export async function register(payload: { username: string; email: string; passw
 }
 
 export async function fetchMe() {
-  return (await authApi.get('/auth/me')) as unknown as MeResponse;
+  const data = (await authApi.get('/auth/me')) as unknown as MeResponse;
+  setUser(data.user);
+  return data;
 }
 
 export function logout() {
-  clearToken();
+  clearAuth();
 }

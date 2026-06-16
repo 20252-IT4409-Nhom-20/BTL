@@ -1,0 +1,57 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'be/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'be/**'
+      - '.github/workflows/backend.yml'
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [24.x]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: be/package-lock.json
+
+    - name: Cache MongoDB Binary
+      uses: actions/cache@v4
+      with:
+        path: be/node_modules/.cache/mongodb-memory-server
+        key: ${{ runner.os }}-mongodb-binaries
+        restore-keys: |
+          ${{ runner.os }}-mongodb-binaries
+
+    - name: Install dependencies
+      run: cd be && npm ci
+
+    - name: Run tests
+      run: cd be && npm test
+      env:
+        JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret-key' }}
+
+  deploy-backend:
+    needs: test-backend
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deployment
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BACKEND_DEPLOY_HOOK }} \
+            --header 'content-type: application/json'
+        env:
+          BACKEND_DEPLOY_HOOK: ${{ secrets.BACKEND_DEPLOY_HOOK }}

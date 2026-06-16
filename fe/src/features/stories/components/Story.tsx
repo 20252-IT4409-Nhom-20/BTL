@@ -18,7 +18,7 @@ export default function Story({ item, rank }: StoryProps) {
               {item.title}
             </a>
           ) : (
-            <Link to={`/item/${item.id}`}>{item.title} (URL not provided)</Link>
+            <Link to={`/item/${item._id}`}>{item.title} (URL not provided)</Link>
           )}
         </td>
       </tr>
@@ -28,7 +28,7 @@ export default function Story({ item, rank }: StoryProps) {
         <td className="supplement-text">
           {item.score} points by {item.by} &nbsp;
           {timeFormatter(item.time)} &nbsp; | &nbsp;
-          <Link to={`/item/${item.id}`}>{item.descendants ?? 0} comments</Link>
+          <Link to={`/item/${item._id}`}>{item.descendants ?? 0} comments</Link>
         </td>
       </tr>
     </>

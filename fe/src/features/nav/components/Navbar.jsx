@@ -1,7 +1,18 @@
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/features/auth/useAuth';
 import './Navbar.css';
 
 export const Navbar = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const initial = user?.username?.charAt(0)?.toUpperCase() ?? '?';
+
   return (
     <nav>
       <table className="nav-table">
@@ -34,8 +45,27 @@ export const Navbar = () => {
               </span>
             </td>
             <td style={{ textAlign: 'right', paddingRight: '4px' }}>
-              <span className="pagetop">
-                <Link to="/login?goto=news">login</Link>
+              <span className="pagetop nav-user">
+                {isAuthenticated ? (
+                  <>
+                    <span
+                      className="nav-avatar"
+                      title={user?.username ?? ''}
+                      aria-label={`Logged in as ${user?.username ?? ''}`}
+                    >
+                      {initial}
+                    </span>
+                    <button
+                      type="button"
+                      className="nav-logout"
+                      onClick={handleLogout}
+                    >
+                      logout
+                    </button>
+                  </>
+                ) : (
+                  <Link to="/login?goto=news">login</Link>
+                )}
               </span>
             </td>
           </tr>
@@ -44,4 +74,3 @@ export const Navbar = () => {
     </nav>
   );
 };
-

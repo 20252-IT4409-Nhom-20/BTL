@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+const APIError = require('../utils/APIError');
 
 module.exports = async function authMiddleware(req, res, next) {
   try {
@@ -7,32 +8,38 @@ module.exports = async function authMiddleware(req, res, next) {
     const [type, token] = header.split(' ');
 
     if (type !== 'Bearer' || !token) {
-      return res.status(401).json({ message: 'Missing or invalid Authorization header' });
+      throw new APIError(401, 'UNAUTHORIZED', 'Missing or invalid Authorization header');
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded?.id || decoded?.userId || decoded?._id;
     if (!userId) {
-      return res.status(401).json({ message: 'Invalid token payload' });
+      throw new APIError(401, 'UNAUTHORIZED', 'Invalid token payload');
     }
 
-    const user = await User.findById(userId).select('role isBanned');
+    const user = await User.findById(userId).select('username role isBanned');
     if (!user) {
-      return res.status(401).json({ message: 'User not found' });
+      throw new APIError(401, 'UNAUTHORIZED', 'User not found');
     }
 
     if (user.isBanned) {
-      return res.status(403).json({ message: 'Account is banned', code: 'USER_BANNED' });
+      throw new APIError(403, 'USER_BANNED', 'Account is banned');
     }
 
     req.userId = userId;
     req.user = {
       id: userId,
+      username: user.username,
       role: user.role || decoded?.role || 'user',
     };
 
     return next();
   } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
+    if (err instanceof APIError) {
+      return next(err);
+    }
+
+    return next(new APIError(401, 'UNAUTHORIZED', 'Invalid or expired token'));
+
   }
 };

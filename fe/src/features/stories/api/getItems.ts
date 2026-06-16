@@ -2,25 +2,28 @@ import { queryOptions, useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import type { hnItem } from '@/types/hnItem';
 
-const storyEndpoints = {
-  top: '/topstories',
-  new: '/newstories',
-  best: '/beststories',
-  ask: '/askstories',
-  show: '/showstories',
-  job: '/jobstories',
+export type StoryType = 'top' | 'new' | 'best' | 'ask' | 'show' | 'job';
+
+type StoriesResponse = {
+  type: StoryType;
+  page: number;
+  count: number;
+  items: hnItem[];
 };
 
-export const fetchStoriesItems = (
-  type: keyof typeof storyEndpoints,
+export const fetchStoriesItems = async (
+  type: StoryType,
   page: number,
   limit: number
 ): Promise<hnItem[]> => {
-  return api.get(`${storyEndpoints[type]}?page=${page}&limit=${limit}`);
+  const data = (await api.get(`/stories/${type}`, {
+    params: { page, limit },
+  })) as unknown as StoriesResponse;
+  return data.items;
 };
 
 export const getStoriesItemsQueryOptions = (
-  type: keyof typeof storyEndpoints,
+  type: StoryType,
   page: number,
   limit: number
 ) => {
@@ -32,7 +35,7 @@ export const getStoriesItemsQueryOptions = (
 };
 
 export const useStoriesItems = (
-  type: keyof typeof storyEndpoints,
+  type: StoryType,
   page: number,
   limit: number
 ) => {

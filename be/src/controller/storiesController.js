@@ -1,87 +1,91 @@
-const fs = require('fs/promises');
-const path = require('path');
+const storiesService = require('../services/storiesService');
+const APIError = require('../utils/APIError');
 
-const MOCK_DATA_DIR = path.resolve(__dirname, '../../../be-mock/mock_data');
-const STORY_TYPES = new Set(['story', 'ask', 'show', 'job', 'poll']);
+const CREATABLE_STORY_TYPES = new Set(['story', 'job', 'poll']);
+const FEED_TYPES = new Set(['top', 'new', 'best', 'ask', 'show', 'job']);
 
-async function readMockJson(fileName) {
-  const filePath = path.join(MOCK_DATA_DIR, fileName);
-  const raw = await fs.readFile(filePath, 'utf8');
-  return JSON.parse(raw);
-}
+async function getStories(req, res, next) {
+  const { type } = req.params;
 
-async function getStories(req, res) {
   try {
-    const stories = await readMockJson('topstories.json');
+    if (!FEED_TYPES.has(type)) {
+      throw new APIError(400, 'VALIDATION_ERROR', 'Invalid story type');
+    }
+
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 30, 1), 100);
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const stories = await storiesService.getStories(type, page, limit);
     return res.json(stories);
   } catch (err) {
-    return res.status(500).json({ message: 'Failed to read top stories' });
+    return next(err);
   }
 }
 
-async function getItem(req, res) {
+async function getItem(req, res, next) {
+  const id = req.params.id;
+  
   try {
-    const item = await readMockJson(`${req.params.id}.json`);
+    const item = await storiesService.getItemWithComments(id);
+    if (!item) {
+      throw new APIError(404, 'NOT_FOUND', `Item ${id} not found`);
+    }
+
     return res.json(item);
   } catch (err) {
-    return res.status(404).json({ message: `Item ${req.params.id} not found` });
+    return next(err);
   }
 }
 
-function createStory(req, res) {
+async function createStory(req, res, next) {
   const { title, url, text, type = 'story' } = req.body || {};
 
-  if (!title || typeof title !== 'string' || !title.trim()) {
-    return res.status(400).json({ message: 'Title is required' });
+  try {
+    if (!title || typeof title !== 'string' || !title.trim()) {
+      throw new APIError(400, 'VALIDATION_ERROR', 'Title is required');
+    }
+
+    if (!CREATABLE_STORY_TYPES.has(type)) {
+      throw new APIError(400, 'VALIDATION_ERROR', 'Invalid story type');
+    }
+    if (!url && !text) {
+      throw new APIError(400, 'VALIDATION_ERROR', 'Either url or text is required');
+    }
+
+    const story = await storiesService.createStory({
+        title,
+        url,
+        text,
+        type,
+        by: req.user?.username || 'anonymous'
+    });
+    return res.status(201).json(story);
+  } catch (err) {
+    return next(err);
   }
-
-  if (!STORY_TYPES.has(type)) {
-    return res.status(400).json({ message: 'Invalid story type' });
-  }
-
-  if (!url && !text) {
-    return res.status(400).json({ message: 'Either url or text is required' });
-  }
-
-  const now = Math.floor(Date.now() / 1000);
-
-  return res.status(201).json({
-    message: 'Story creation placeholder. Persist this to the database later.',
-    story: {
-      id: now,
-      type,
-      title: title.trim(),
-      url: url || undefined,
-      text: text || undefined,
-      by: req.user?.id || 'authenticated-user',
-      time: now,
-      score: 0,
-      descendants: 0,
-    },
-  });
 }
 
-function createComment(req, res) {
-  const { text, parent_id: parentId } = req.body || {};
+async function createComment(req, res, next) {
+  const { text, parent_id: parentId, root_id: rootId } = req.body || {};
 
-  if (!text || typeof text !== 'string' || !text.trim()) {
-    return res.status(400).json({ message: 'Comment text is required' });
+  try {
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      throw new APIError(400, 'VALIDATION_ERROR', 'Comment text is required');
+    }
+
+    if (!parentId) {
+      throw new APIError(400, 'VALIDATION_ERROR', 'Parent ID is required');
+    }
+
+    const comment = await storiesService.createComment({
+        text,
+        parentId,
+        rootId,
+        by: req.user?.username || 'anonymous'
+    });
+    return res.status(201).json(comment);
+  } catch (err) {
+    return next(err);
   }
-
-  const now = Math.floor(Date.now() / 1000);
-
-  return res.status(201).json({
-    message: 'Comment creation placeholder. Persist this to the database later.',
-    comment: {
-      id: now,
-      type: 'comment',
-      by: req.user?.id || 'authenticated-user',
-      time: now,
-      text: text.trim(),
-      parent: Number(parentId || req.params.id),
-      kids: [],
-    },
-  });
 }
 
 function voteStory(req, res) {
@@ -93,12 +97,37 @@ function voteStory(req, res) {
   });
 }
 
-function deleteStory(req, res) {
-  return res.json({
-    message: 'Delete story placeholder. Enforce author/admin ownership in the database later.',
-    storyId: Number(req.params.id),
-    deleted: true,
-  });
+async function deleteStory(req, res) {
+  try {
+    const result = await storiesService.deleteItem({
+      itemId: req.params.id,
+      actor: req.user,
+    });
+    return res.json(result);
+  } catch (err) {
+    if (err instanceof storiesService.StoriesServiceError) {
+      return res.status(err.status).json({ message: err.message, code: err.code });
+    }
+    console.error('[DeleteStory Error]:', err);
+    return res.status(500).json({ message: 'Failed to delete item' });
+  }
+}
+
+async function editItem(req, res) {
+  try {
+    const item = await storiesService.editItem({
+      itemId: req.params.id,
+      updates: req.body || {},
+      actor: req.user,
+    });
+    return res.json(item);
+  } catch (err) {
+    if (err instanceof storiesService.StoriesServiceError) {
+      return res.status(err.status).json({ message: err.message, code: err.code });
+    }
+    console.error('[EditItem Error]:', err);
+    return res.status(500).json({ message: 'Failed to edit item' });
+  }
 }
 
 module.exports = {
@@ -108,4 +137,5 @@ module.exports = {
   createComment,
   voteStory,
   deleteStory,
+  editItem,
 };
