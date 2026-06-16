@@ -137,7 +137,7 @@ router.put("/stories/:id/vote", auth, storiesController.voteStory);
  * @openapi
  * /api/stories/{id}:
  *   delete:
- *     summary: Delete a story
+ *     summary: Delete a story (owner or admin, within edit window)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -149,7 +149,49 @@ router.put("/stories/:id/vote", auth, storiesController.voteStory);
  *     responses:
  *       200:
  *         description: Story deleted
+ *       403:
+ *         description: Forbidden
  */
 router.delete("/stories/:id", auth, storiesController.deleteStory);
+// Items can be stories or comments; same handler covers both.
+router.delete("/items/:id", auth, storiesController.deleteStory);
+
+/**
+ * @openapi
+ * /api/stories/{id}:
+ *   patch:
+ *     summary: Edit a story or comment (owner or admin, within edit window)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               text:
+ *                 type: string
+ *               title:
+ *                 type: string
+ *               url:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Item updated
+ *       400:
+ *         description: Edit window expired or no editable fields
+ *       403:
+ *         description: Forbidden
+ */
+router.patch("/stories/:id", auth, storiesController.editItem);
+router.patch("/items/:id", auth, storiesController.editItem);
+router.patch("/comments/:id", auth, storiesController.editItem);
 
 module.exports = router;

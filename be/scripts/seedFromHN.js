@@ -12,7 +12,12 @@ const FEED_TO_ENDPOINT = {
   show: 'showstories',
   job: 'jobstories',
 };
-const MAX_COMMENT_DEPTH = 6;
+// Keep the tree shallow + narrow. Real HN threads have 600+ deep comments
+// which bloat the DB and slow the read path. Migration to ObjectId refs
+// (scripts/migrateToObjectId.js) runs after seeding, so the saved numeric
+// id / parent / kids stay as Numbers until then.
+const MAX_COMMENT_DEPTH = 2;
+const MAX_COMMENTS_PER_ITEM = 5;
 
 async function fetchJson(url) {
   const res = await fetch(url);
@@ -44,7 +49,14 @@ function toDoc(data) {
 
 async function upsertItem(data) {
   const doc = toDoc(data);
-  await Item.updateOne({ id: doc.id }, { $set: doc }, { upsert: true });
+  // Raw collection write bypasses Mongoose strict mode so numeric `id`,
+  // `parent`, and `kids` persist as Numbers until migrateToObjectId.js
+  // rewrites them into ObjectId refs.
+  await Item.collection.updateOne(
+    { id: doc.id },
+    { $set: doc, $setOnInsert: { createdAt: new Date() } },
+    { upsert: true }
+  );
   return doc;
 }
 
@@ -65,7 +77,8 @@ async function walkItem(id, depth, seen, withComments) {
     return;
   }
 
-  for (const kidId of data.kids) {
+  const limitedKids = data.kids.slice(0, MAX_COMMENTS_PER_ITEM);
+  for (const kidId of limitedKids) {
     try {
       await walkItem(kidId, depth + 1, seen, withComments);
     } catch (err) {
@@ -79,6 +92,7 @@ async function seedFromHN() {
   const count = parseInt(args[0], 10) || 10;
   const feedArg = (args[1] || 'top').toLowerCase();
   const withComments = !args.includes('--no-comments');
+  const reset = args.includes('--reset');
   const feedEndpoint = FEED_TO_ENDPOINT[feedArg];
 
   if (!feedEndpoint) {
@@ -92,6 +106,11 @@ async function seedFromHN() {
   }
 
   await mongoose.connect(process.env.MONGO_URI);
+
+  if (reset) {
+    const { deletedCount } = await Item.collection.deleteMany({});
+    console.log(`--reset: dropped ${deletedCount} existing items`);
+  }
 
   const ids = await fetchJson(`${HN_BASE}/${feedEndpoint}.json`);
   const targetIds = (Array.isArray(ids) ? ids : []).slice(0, count);
