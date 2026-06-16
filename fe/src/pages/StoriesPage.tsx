@@ -49,10 +49,12 @@ export default function StoriesPage() {
       <table>
         <tbody>
           {items?.map((item, index) => (
-            <Story key={item._id} item={item} rank={index + 1} />
+            <Story key={item._id} item={item} rank={(page - 1) * limit + (index + 1)} />
           ))}
         </tbody>
       </table>
+
+      {items?.length === 0 && <p style={{ textAlign: 'center' }}>You have reached the end.</p>}
 
       <div style={{ textAlign: 'center' }}>
         <button onClick={handlePrevious} disabled={!canGoPrevious}>
