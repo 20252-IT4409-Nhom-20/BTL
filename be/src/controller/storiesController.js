@@ -111,6 +111,5 @@ module.exports = {
   createStory,
   createComment,
   voteStory,
-  getVote,
   deleteStory,
 };
