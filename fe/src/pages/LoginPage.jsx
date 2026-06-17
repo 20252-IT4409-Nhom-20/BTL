@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import OAuthButtons from './OAuthButtons.jsx'
 import { login } from '@/features/auth/api'
 import './auth.css'
 
@@ -43,8 +42,6 @@ function LoginPage() {
     <div className="auth-page">
       <h1>Login</h1>
       <p className="auth-subtitle">Welcome back to Huster News</p>
-
-      <OAuthButtons action="Login" />
 
       <div className="auth-divider-text">or</div>
 
