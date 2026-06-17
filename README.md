@@ -1,5 +1,7 @@
 # hacker news clone
 
+[Link báo cáo](https://drive.google.com/drive/folders/1jdnqJVDKWxERvfi72FcvPEECvyhkd8RR?usp=sharing)
+
 > [!IMPORTANT]
 > [backlog - tuần 7](example.com)
 > 
