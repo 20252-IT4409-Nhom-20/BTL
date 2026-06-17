@@ -49,6 +49,28 @@ a:hover {
   color: #b00020;
 }
 
+.route-error-fallback {
+  margin: 24px 0;
+  padding: 16px;
+  border: 1px solid #ff6600;
+  background: #fff7f0;
+  color: #1f1f1f;
+}
+
+.route-error-fallback h2,
+.route-error-fallback p {
+  margin: 0 0 8px;
+}
+
+.route-error-fallback button {
+  border: 1px solid #a1a1a1;
+  border-radius: 3px;
+  padding: 4px 8px;
+  background: #f3f3f3;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 .text-wrap,
 .kids-table td,
 .kids-table th {

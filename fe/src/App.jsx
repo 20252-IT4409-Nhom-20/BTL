@@ -1,51 +1,62 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { MainLayout } from '@/components/MainLayout';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import RouteErrorBoundary from '@/components/RouteErrorBoundary';
 import StoriesPage from '@/pages/StoriesPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import ItemPage from '@/pages/ItemPage';
 
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <MainLayout />,
+    ErrorBoundary: RouteErrorBoundary,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/news" replace />,
+      },
+      {
+        path: 'item/:id',
+        element: (
+          <ErrorBoundary>
+            <ItemPage />
+          </ErrorBoundary>
+        ),
+        ErrorBoundary: RouteErrorBoundary,
+      },
+      {
+        path: ':type',
+        element: (
+          <ErrorBoundary>
+            <StoriesPage />
+          </ErrorBoundary>
+        ),
+        ErrorBoundary: RouteErrorBoundary,
+      },
+    ],
+  },
+  {
+    path: '/login',
+    element: (
+      <ErrorBoundary>
+        <LoginPage />
+      </ErrorBoundary>
+    ),
+    ErrorBoundary: RouteErrorBoundary,
+  },
+  {
+    path: '/register',
+    element: (
+      <ErrorBoundary>
+        <RegisterPage />
+      </ErrorBoundary>
+    ),
+    ErrorBoundary: RouteErrorBoundary,
+  },
+]);
+
 export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route
-            path="/item/:id"
-            element={(
-              <ErrorBoundary>
-                <ItemPage />
-              </ErrorBoundary>
-            )}
-          />
-          <Route
-            path="/:type"
-            element={(
-              <ErrorBoundary>
-                <StoriesPage />
-              </ErrorBoundary>
-            )}
-          />
-          <Route path="/" element={<Navigate to="/news" replace />} />
-        </Route>
-        <Route
-          path="/login"
-          element={(
-            <ErrorBoundary>
-              <LoginPage />
-            </ErrorBoundary>
-          )}
-        />
-        <Route
-          path="/register"
-          element={(
-            <ErrorBoundary>
-              <RegisterPage />
-            </ErrorBoundary>
-          )}
-        />
-      </Routes>
-    </BrowserRouter>
-  );
+  return <RouterProvider router={router} />;
 }

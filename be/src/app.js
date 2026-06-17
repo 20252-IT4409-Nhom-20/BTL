@@ -7,15 +7,35 @@ const swaggerSpec = require('./swagger');
 
 const app = express();
 
+const defaultAllowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+];
+
+const allowedOrigins = (
+  process.env.FRONTEND_URL
+    ? [process.env.FRONTEND_URL, ...defaultAllowedOrigins]
+    : defaultAllowedOrigins
+);
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  optionsSuccessStatus: 204,
 };
 const pinoHttp = require('pino-http');
 const logger = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
 
 app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 app.use(pinoHttp({
   logger,
