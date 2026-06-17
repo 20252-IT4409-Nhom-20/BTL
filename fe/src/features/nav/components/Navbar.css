@@ -1,13 +1,25 @@
 /* Navbar styles extracted from news.css and refined for React */
 
-.nav-table {
-  width: 100%;
-  border-collapse: collapse;
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ff6600;
+  padding: 4px 8px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.logo-cell {
-  width: 18px;
-  padding-right: 4px;
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
 }
 
 .logo-img {
@@ -20,6 +32,22 @@
   font-size: 10pt;
   color: #222222;
   line-height: 12pt;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.nav-links {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.divider {
+  color: #222222;
+  user-select: none;
 }
 
 .pagetop a:visited {
@@ -54,8 +82,8 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #ff6600;
-  color: #ffffff;
+  background: #ffffff;
+  color: #ff6600;
   font-size: 11px;
   font-weight: bold;
   font-family: Verdana, Geneva, sans-serif;
