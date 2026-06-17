@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/MainLayout';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import StoriesPage from '@/pages/StoriesPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
@@ -10,12 +11,40 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/item/:id" element={<ItemPage />} />
-          <Route path="/:type" element={<StoriesPage />} />
+          <Route
+            path="/item/:id"
+            element={(
+              <ErrorBoundary>
+                <ItemPage />
+              </ErrorBoundary>
+            )}
+          />
+          <Route
+            path="/:type"
+            element={(
+              <ErrorBoundary>
+                <StoriesPage />
+              </ErrorBoundary>
+            )}
+          />
           <Route path="/" element={<Navigate to="/news" replace />} />
         </Route>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/login"
+          element={(
+            <ErrorBoundary>
+              <LoginPage />
+            </ErrorBoundary>
+          )}
+        />
+        <Route
+          path="/register"
+          element={(
+            <ErrorBoundary>
+              <RegisterPage />
+            </ErrorBoundary>
+          )}
+        />
       </Routes>
     </BrowserRouter>
   );

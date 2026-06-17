@@ -11,6 +11,10 @@ body {
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 #root {
   min-height: 100svh;
   display: flex;
@@ -114,8 +118,148 @@ code {
   margin-top: 6px;
 }
 
+.comment-actions button,
+.form-actions button {
+  border: 1px solid #cfc7b5;
+  border-radius: 999px;
+  background: #fff8ef;
+  color: #3a2b14;
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+.form-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.stories-table-wrap {
+  overflow-x: auto;
+}
+
+.stories-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stories-table td {
+  padding: 3px 0;
+  vertical-align: top;
+}
+
+.rank {
+  width: 38px;
+  padding-right: 8px;
+  color: #6f6f6f;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.title,
+.supplement-text {
+  min-width: 0;
+}
+
+.title a {
+  overflow-wrap: anywhere;
+}
+
+.supplement-text {
+  color: #6f6f6f;
+  font-size: 12px;
+  padding-bottom: 8px;
+}
+
+.item-title {
+  overflow-wrap: anywhere;
+}
+
+.story-link,
+.item-url {
+  overflow-wrap: anywhere;
+}
+
+.item-meta,
+.login-prompt {
+  margin: 0;
+  color: #6f6f6f;
+  font-size: 12px;
+}
+
+.item-text {
+  overflow: hidden;
+}
+
+.comments-heading {
+  margin: 0;
+}
+
+.comment-form-container {
+  width: 100%;
+}
+
+.comment-form {
+  display: grid;
+  gap: 10px;
+}
+
+.comment-form textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  border: 1px solid #cfc7b5;
+  border-radius: 8px;
+  resize: vertical;
+  font: inherit;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.yclinks {
+  color: #828282;
+  font-size: 10pt;
+  overflow-wrap: anywhere;
+}
+
+footer input[type='text'] {
+  width: min(100%, 220px);
+  max-width: 100%;
+}
+
 @media (max-width: 680px) {
+  #root {
+    width: min(100%, 96vw);
+  }
+
   .hn-comment {
     margin-inline-start: min(var(--comment-indent, 0px), 30vw);
+  }
+
+  .rank {
+    width: 30px;
+    padding-right: 6px;
+  }
+
+  .supplement-text {
+    font-size: 11px;
+  }
+
+  .item-url {
+    display: block;
+    margin-top: 4px;
+  }
+
+  .comment-form textarea {
+    min-height: 100px;
+  }
+}
+
+@media (min-width: 681px) and (max-width: 1023px) {
+  #root {
+    width: min(100%, 94vw);
   }
 }

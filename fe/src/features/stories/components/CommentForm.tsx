@@ -34,7 +34,6 @@ export default function CommentForm({ parentId, rootId, onSuccess }: CommentForm
         <textarea
           name="commentText"
           rows={6}
-          cols={80}
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
           placeholder="Add your comment..."

@@ -10,6 +10,7 @@ const pathToType: Record<string, StoryType> = {
   jobs: 'job',
 };
 
+
 export default function StoriesPage() {
   const { type } = useParams<{ type: string }>();
   const [searchParams] = useSearchParams();
@@ -41,18 +42,20 @@ export default function StoriesPage() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
   if (error) return <div>Error: {error?.message}</div>;
 
   return (
     <div>
-
-      <table>
-        <tbody>
-          {items?.map((item, index) => (
-            <Story key={item._id} item={item} rank={index + 1} />
-          ))}
-        </tbody>
-      </table>
+      <div className="stories-table-wrap">
+        <table className="stories-table">
+          <tbody>
+            {items?.map((item, index) => (
+              <Story key={item._id} item={item} rank={index + 1} />
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <div style={{ textAlign: 'center' }}>
         <button onClick={handlePrevious} disabled={!canGoPrevious}>
@@ -80,7 +83,7 @@ export default function StoriesPage() {
           <option value={50}>50</option>
         </select>
       </div>
-
     </div>
   );
+  
 }
