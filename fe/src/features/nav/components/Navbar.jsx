@@ -35,6 +35,7 @@ export const Navbar = () => {
                   <Link to="/news">Huster News</Link>
                 </b>
                 {' '}
+                <NavLink to="/new">new</NavLink> |{' '}
                 <NavLink to="/ask">ask</NavLink> |{' '}
                 <NavLink to="/show">show</NavLink> |{' '}
                 <NavLink to="/jobs">jobs</NavLink> |{' '}
