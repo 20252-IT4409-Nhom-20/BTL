@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import OAuthButtons from './OAuthButtons.jsx'
 import { register, login } from '@/features/auth/api'
 import './auth.css'
 
@@ -58,10 +57,6 @@ function RegisterPage() {
     <div className="auth-page">
       <h1>Create Account</h1>
       <p className="auth-subtitle">Join the Huster News community</p>
-
-      <OAuthButtons action="Sign up" />
-
-      <div className="auth-divider-text">or</div>
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="auth-row">
