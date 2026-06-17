@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/MainLayout';
 import StoriesPage from '@/pages/StoriesPage';
 import LoginPage from '@/pages/LoginPage';
-import RegisterPage from '@/pages/RegisterPage';
+// RegisterPage removed, merged into LoginPage
 import ItemPage from '@/pages/ItemPage';
 import SubmitPage from '@/pages/SubmitPage';
 
@@ -17,7 +17,6 @@ export default function App() {
           <Route path="/" element={<Navigate to="/news" replace />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
       </Routes>
     </BrowserRouter>
   );
