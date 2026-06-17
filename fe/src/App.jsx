@@ -4,6 +4,7 @@ import StoriesPage from '@/pages/StoriesPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import ItemPage from '@/pages/ItemPage';
+import SubmitPage from '@/pages/SubmitPage';
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/item/:id" element={<ItemPage />} />
+          <Route path="/submit" element={<SubmitPage />} />
           <Route path="/:type" element={<StoriesPage />} />
           <Route path="/" element={<Navigate to="/news" replace />} />
         </Route>
