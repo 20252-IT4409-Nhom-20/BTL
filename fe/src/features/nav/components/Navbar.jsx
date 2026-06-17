@@ -35,9 +35,6 @@ export const Navbar = () => {
                   <Link to="/news">Huster News</Link>
                 </b>
                 {' '}
-                <NavLink to="/newest">new</NavLink> |{' '}
-                <NavLink to="/front">past</NavLink> |{' '}
-                <NavLink to="/newcomments">comments</NavLink> |{' '}
                 <NavLink to="/ask">ask</NavLink> |{' '}
                 <NavLink to="/show">show</NavLink> |{' '}
                 <NavLink to="/jobs">jobs</NavLink> |{' '}

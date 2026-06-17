@@ -22,6 +22,10 @@
   line-height: 12pt;
 }
 
+.pagetop a:visited {
+  color: inherit;
+}
+
 .hnname {
   margin-left: 1px;
   margin-right: 5px;
