@@ -1,4 +1,5 @@
 import { useState, type CSSProperties } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { timeFormatter } from '@/lib/timeFormatter';
 import type { hnItem } from '@/types/hnItem';
 import DOMPurify from 'dompurify';
@@ -19,11 +20,12 @@ export default function Comment({ comment, depth, rootId }: CommentProps) {
 
   const isOwner = user?.username === comment.by;
 
+  const queryClient = useQueryClient();
   const handleDelete = async () => {
     if (confirm('Are you sure you want to delete this comment?')) {
       try {
         await deleteStory(String(comment._id || comment.id));
-        window.location.reload();
+        queryClient.invalidateQueries({ queryKey: ['item', rootId] });
       } catch (err) {
         alert('Failed to delete.');
       }
