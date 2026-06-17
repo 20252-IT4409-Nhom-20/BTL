@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useItem } from '@/features/stories/api/getItem';
+import { useDeleteStory } from '@/features/stories/api/deleteStory';
 import { useAuth } from '@/features/auth/useAuth';
 import { timeFormatter } from '@/lib/timeFormatter';
 import Comment from '@/features/stories/components/Comment';
@@ -9,8 +10,21 @@ import CommentForm from '@/features/stories/components/CommentForm';
 export default function ItemPage() {
   const { id } = useParams<{ id: string }>();
   const itemId = id || null;
+  const navigate = useNavigate();
   const { data: item, isLoading, error } = useItem(itemId as any);
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const deleteStoryMutation = useDeleteStory();
+
+  const handleDelete = async () => {
+    if (!itemId || !confirm('Are you sure you want to delete this story?')) return;
+    try {
+      await deleteStoryMutation.mutateAsync(itemId);
+      navigate('/');
+    } catch (err) {
+      console.error('Failed to delete story', err);
+      alert('Failed to delete story');
+    }
+  };
 
   if (!itemId) {
     return <p className="status error">Invalid item id.</p>;
@@ -30,6 +44,8 @@ export default function ItemPage() {
 
   const [story, ...comments] = item;
   const rootId = story._id || story.id;
+  
+  const canDelete = isAuthenticated && user && (user.username === story.by || user.role === 'admin');
 
   return (
     <section className="item-page">
@@ -50,6 +66,18 @@ export default function ItemPage() {
         </h1>
         <p className="item-meta">
           {story.score ?? 0} points by {story.by ?? 'unknown'} · {timeFormatter(story.time)}
+          {canDelete && (
+             <span>
+               {' | '}
+               <button 
+                 onClick={handleDelete} 
+                 disabled={deleteStoryMutation.isPending}
+                 style={{ color: 'red', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+               >
+                 {deleteStoryMutation.isPending ? 'Deleting...' : 'delete'}
+               </button>
+             </span>
+          )}
         </p>
       </div>
 
